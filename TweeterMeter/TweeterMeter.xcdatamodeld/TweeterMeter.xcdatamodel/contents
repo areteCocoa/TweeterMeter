@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="Test1.xcdatamodel" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="Event">
-        <attribute name="timeStamp" optional="YES" attributeType="Date"/>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13A603" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Term">
+        <attribute name="creationTime" optional="YES" attributeType="Date">
+            <userInfo/>
+        </attribute>
+        <attribute name="term" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="tweets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tweet" inverseName="term" inverseEntity="Tweet" syncable="YES"/>
+        <userInfo/>
+    </entity>
+    <entity name="Tweet" syncable="YES">
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Event" positionX="261" positionY="189" width="128" height="60"/>
+        <element name="Term" positionX="295" positionY="108" width="128" height="88"/>
+        <element name="Tweet" positionX="502" positionY="189" width="128" height="88"/>
     </elements>
 </model>

@@ -25,6 +25,7 @@
 		54E0AFE018667C7B00EA5100 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFBB18667C7B00EA5100 /* CoreData.framework */; };
 		54E0AFE818667C7B00EA5100 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 54E0AFE618667C7B00EA5100 /* InfoPlist.strings */; };
 		54E0AFEA18667C7B00EA5100 /* TweeterMeterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E0AFE918667C7B00EA5100 /* TweeterMeterTests.m */; };
+		54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,8 @@
 		54E0AFE518667C7B00EA5100 /* TweeterMeterTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TweeterMeterTests-Info.plist"; sourceTree = "<group>"; };
 		54E0AFE718667C7B00EA5100 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		54E0AFE918667C7B00EA5100 /* TweeterMeterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TweeterMeterTests.m; sourceTree = "<group>"; };
+		54E0AFF318668F7000EA5100 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+Blocks.h"; sourceTree = "<group>"; };
+		54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +133,8 @@
 				54E0AFD018667C7B00EA5100 /* TMMasterViewController.m */,
 				54E0AFD218667C7B00EA5100 /* TMDetailViewController.h */,
 				54E0AFD318667C7B00EA5100 /* TMDetailViewController.m */,
+				54E0AFF318668F7000EA5100 /* UIAlertView+Blocks.h */,
+				54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */,
 				54E0AFD518667C7B00EA5100 /* Images.xcassets */,
 				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
 				54E0AFBE18667C7B00EA5100 /* Supporting Files */,
@@ -267,6 +272,7 @@
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				54E0AFC418667C7B00EA5100 /* main.m in Sources */,
 				54E0AFD418667C7B00EA5100 /* TMDetailViewController.m in Sources */,
+				54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */,
 				54E0AFC818667C7B00EA5100 /* TMAppDelegate.m in Sources */,
 				54E0AFD118667C7B00EA5100 /* TMMasterViewController.m in Sources */,
 			);
