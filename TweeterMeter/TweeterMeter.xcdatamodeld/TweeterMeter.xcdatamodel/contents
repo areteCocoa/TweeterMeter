@@ -4,17 +4,17 @@
         <attribute name="creationTime" optional="YES" attributeType="Date">
             <userInfo/>
         </attribute>
-        <attribute name="term" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="tweets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tweet" inverseName="term" inverseEntity="Tweet" syncable="YES"/>
         <userInfo/>
     </entity>
-    <entity name="Tweet" syncable="YES">
+    <entity name="Tweet" representedClassName="Tweet" syncable="YES">
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Term" positionX="295" positionY="108" width="128" height="88"/>
-        <element name="Tweet" positionX="502" positionY="189" width="128" height="88"/>
+        <element name="Term" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Tweet" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

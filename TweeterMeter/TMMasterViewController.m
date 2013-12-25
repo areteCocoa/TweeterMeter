@@ -7,7 +7,7 @@
 //
 
 #import "TMMasterViewController.h"
-
+#import "TMTerm.h"
 #import "TMDetailViewController.h"
 #import "UIAlertView+Blocks.h"
 
@@ -50,7 +50,7 @@
     // If appropriate, configure the new managed object.
     // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
     [newManagedObject setValue:[NSDate date] forKey:@"creationTime"];
-    [newManagedObject setValue:@"Term" forKey:@"term"];
+    [newManagedObject setValue:@"Term" forKey:@"name"];
     
     UIAlertView *nameAlertView = [[UIAlertView alloc] initWithTitle:@"Term Needed" message:@"Enter the term to be searched" delegate:Nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
     nameAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -59,7 +59,7 @@
             NSLog(@"Cancel");
         } else if (buttonIndex == 1) {
             NSString *entry = [alertView textFieldAtIndex:0].text;
-            [newManagedObject setValue:entry forKey:@"term"];
+            [newManagedObject setValue:entry forKey:@"name"];
             
             // Save the context.
             NSError *error = nil;
@@ -125,7 +125,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-    self.detailViewController.detailItem = object;
+    
+    self.detailViewController.term = [TMTerm termFromManagedObject:object withContext:self.managedObjectContext];
 }
 
 #pragma mark - Fetched results controller
@@ -230,7 +231,7 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath
 {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[object valueForKey:@"term"] description];
+    cell.textLabel.text = [[object valueForKey:@"name"] description];
 }
 
 @end

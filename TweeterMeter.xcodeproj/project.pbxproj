@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		547495DF18674D1900B969DB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547495DE18674D1900B969DB /* Social.framework */; };
+		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
 		54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB518667C7B00EA5100 /* Foundation.framework */; };
 		54E0AFB818667C7B00EA5100 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */; };
 		54E0AFBA18667C7B00EA5100 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB918667C7B00EA5100 /* UIKit.framework */; };
@@ -27,6 +28,7 @@
 		54E0AFE818667C7B00EA5100 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 54E0AFE618667C7B00EA5100 /* InfoPlist.strings */; };
 		54E0AFEA18667C7B00EA5100 /* TweeterMeterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E0AFE918667C7B00EA5100 /* TweeterMeterTests.m */; };
 		54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */; };
+		54F027441868D9F7007F3BD5 /* TMTerm.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F027431868D9F7007F3BD5 /* TMTerm.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,8 @@
 
 /* Begin PBXFileReference section */
 		547495DE18674D1900B969DB /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		54D9C393186B64290078456B /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
+		54D9C394186B64290078456B /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		54E0AFB218667C7B00EA5100 /* TweeterMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TweeterMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54E0AFB518667C7B00EA5100 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -66,6 +70,8 @@
 		54E0AFE918667C7B00EA5100 /* TweeterMeterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TweeterMeterTests.m; sourceTree = "<group>"; };
 		54E0AFF318668F7000EA5100 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+Blocks.h"; sourceTree = "<group>"; };
 		54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+Blocks.m"; sourceTree = "<group>"; };
+		54F027421868D9F7007F3BD5 /* TMTerm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMTerm.h; sourceTree = "<group>"; };
+		54F027431868D9F7007F3BD5 /* TMTerm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMTerm.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,10 +143,13 @@
 				54E0AFD018667C7B00EA5100 /* TMMasterViewController.m */,
 				54E0AFD218667C7B00EA5100 /* TMDetailViewController.h */,
 				54E0AFD318667C7B00EA5100 /* TMDetailViewController.m */,
-				54E0AFF318668F7000EA5100 /* UIAlertView+Blocks.h */,
-				54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */,
+				54F027421868D9F7007F3BD5 /* TMTerm.h */,
+				54F027431868D9F7007F3BD5 /* TMTerm.m */,
+				54D9C393186B64290078456B /* Tweet.h */,
+				54D9C394186B64290078456B /* Tweet.m */,
 				54E0AFD518667C7B00EA5100 /* Images.xcassets */,
 				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
+				54F027451868DA0B007F3BD5 /* UIAlertView+Blocks */,
 				54E0AFBE18667C7B00EA5100 /* Supporting Files */,
 			);
 			path = TweeterMeter;
@@ -173,6 +182,15 @@
 				54E0AFE618667C7B00EA5100 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		54F027451868DA0B007F3BD5 /* UIAlertView+Blocks */ = {
+			isa = PBXGroup;
+			children = (
+				54E0AFF318668F7000EA5100 /* UIAlertView+Blocks.h */,
+				54E0AFF418668F7000EA5100 /* UIAlertView+Blocks.m */,
+			);
+			name = "UIAlertView+Blocks";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -276,6 +294,8 @@
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				54E0AFC418667C7B00EA5100 /* main.m in Sources */,
 				54E0AFD418667C7B00EA5100 /* TMDetailViewController.m in Sources */,
+				54D9C395186B64290078456B /* Tweet.m in Sources */,
+				54F027441868D9F7007F3BD5 /* TMTerm.m in Sources */,
 				54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */,
 				54E0AFC818667C7B00EA5100 /* TMAppDelegate.m in Sources */,
 				54E0AFD118667C7B00EA5100 /* TMMasterViewController.m in Sources */,
