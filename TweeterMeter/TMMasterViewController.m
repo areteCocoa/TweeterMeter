@@ -10,6 +10,7 @@
 #import "TMTerm.h"
 #import "TMDetailViewController.h"
 #import "UIAlertView+Blocks.h"
+#import "Term.h"
 
 @interface TMMasterViewController ()
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
@@ -126,7 +127,10 @@
 {
     NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
     
-    self.detailViewController.term = [TMTerm termFromManagedObject:object withContext:self.managedObjectContext];
+    if ([object isMemberOfClass:[Term class]]) {
+        Term *managedTerm = (Term *)object;
+        self.detailViewController.term = [TMTerm termFromManagedTerm:managedTerm withContext:self.managedObjectContext];
+    }
 }
 
 #pragma mark - Fetched results controller

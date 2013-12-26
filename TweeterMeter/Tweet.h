@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-
+#import "Term.h"
 
 @interface Tweet : NSManagedObject
 
 @property (nonatomic, retain) NSString * text;
 @property (nonatomic, retain) NSString * user;
-@property (nonatomic, retain) NSManagedObject *term;
+@property (nonatomic, retain) Term * term;
 
 @end

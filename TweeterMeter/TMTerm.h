@@ -7,15 +7,25 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Term.h"
+
+@protocol TMTermDelegate <NSObject>
+
+- (void)tweetsDidUpdate;
+- (void)tweetsDidSave;
+
+@end
 
 @interface TMTerm : NSObject
 
 @property (strong, nonatomic) NSString *name;
-@property (strong, nonatomic) NSSet *tweets;
+@property (strong, nonatomic) NSMutableSet *tweets;
 @property (strong, nonatomic) NSNumber *maxID;
 @property (strong, nonatomic) NSNumber *minID;
 
-+ (TMTerm *)termFromManagedObject: (NSManagedObject *) managedObject withContext:context;
+@property id <TMTermDelegate> delegate;
+
++ (TMTerm *) termFromManagedTerm:(Term *)managedTerm withContext:(NSManagedObjectContext *)context;
 
 - (void)fetchNumberOfTweets:(int)number;
 

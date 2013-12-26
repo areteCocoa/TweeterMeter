@@ -11,7 +11,7 @@
 #import <Accounts/Accounts.h>
 #import "TMTerm.h"
 
-@interface TMDetailViewController : UIViewController <UISplitViewControllerDelegate>
+@interface TMDetailViewController : UIViewController <UISplitViewControllerDelegate, TMTermDelegate>
 
 @property (strong, nonatomic) TMTerm *term;
 

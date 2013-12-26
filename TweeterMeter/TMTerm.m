@@ -13,31 +13,33 @@
 
 @interface TMTerm()
 
-@property (strong, nonatomic) NSManagedObject *managedObject;
+@property (strong, nonatomic) Term *managedTerm;
 @property (strong, nonatomic) NSManagedObjectContext *context;
-@property (strong, nonatomic) NSMutableSet *unsavedTweets;
 
 @end
 
 @implementation TMTerm
 
-+ (TMTerm *) termFromManagedObject:(NSManagedObject *)managedObject withContext:(NSManagedObjectContext *)context {
++ (TMTerm *) termFromManagedTerm:(Term *)managedTerm withContext:(NSManagedObjectContext *)context {
     TMTerm *term = [[TMTerm alloc] init];
-    term.managedObject = managedObject;
+    term.managedTerm = managedTerm;
     term.context = context;
     
-    id name = [managedObject valueForKey:@"name"];
+    id name = managedTerm.name;
     if ([name isKindOfClass:[NSString class]]) {
         term.name = name;
     }
     
-    id tweets = [managedObject valueForKey:@"tweets"];
+    term.tweets = [NSMutableSet set];
+    id tweets = managedTerm.tweets;
     if ([tweets isKindOfClass:[NSSet class]]) {
-        term.tweets = tweets;
+        term.tweets = [tweets mutableCopy];
     }
     if (!term.tweets || term.tweets.count < 10) {
         [term fetchNumberOfTweets:10];
     }
+    
+    NSLog(@"%lu", (unsigned long)term.tweets.count);
     
     return term;
 }
@@ -124,44 +126,43 @@
          }];
     }
     
-    // [self addTweets: tweets]
-}
-
-
-
-- (BOOL)saveTerm {
-    
-    
-    return NO;
+    [self save];
 }
 
 - (void)setName:(NSString *)name {
     _name = name;
-    [_managedObject setValue:name forKey:@"name"];
+    _managedTerm.name = name;
 }
 
 - (void)addTweets:(NSSet *)objects {
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:_context];
     for (id object in objects) {
-        NSLog(@"%@: %@", [object class], object);
+        // NSLog(@"%@: %@", [object class], object);
         Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:_context];
         tweet.user = [[object valueForKey:@"user"] valueForKey:@"name"];
         tweet.text = [object valueForKey:@"text"];
-        tweet.term = self.managedObject;
+        tweet.term = self.managedTerm;
+        
+        [self.tweets addObject:tweet];
     }
+    NSLog(@"%@", self.tweets);
     
+    [self.delegate tweetsDidUpdate];
     [self save];
+    [self.delegate tweetsDidSave];
 }
 
-- (void)save {
+- (BOOL)save {
     // Save the context.
     NSError *error = nil;
     if (![_context save:&error]) {
         // Replace this implementation with code to handle the error appropriately.
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        return NO;
         abort();
     }
+    return YES;
 }
 
 @end

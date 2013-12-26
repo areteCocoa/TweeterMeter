@@ -21,9 +21,14 @@
 
 - (void)setTerm:(TMTerm *)term {
     if (_term != term) {
+        term.delegate = self;
         _term = term;
         
         [self configureView];
+    }
+    
+    if (self.masterPopoverController != nil) {
+        [self.masterPopoverController dismissPopoverAnimated:YES];
     }
 }
 
@@ -33,9 +38,7 @@
 
     if (self.term) {
         self.navigationItem.title = self.term.name;
-        
-        NSString *detailString = [self.term.tweets description];
-        self.detailDescriptionLabel.text = detailString;
+        // self.detailDescriptionLabel.text = @"The Term has successfully loaded!";
     }
 }
 
@@ -45,6 +48,7 @@
 	// Do any additional setup after loading the view, typically from a nib.
     // Update modal with newer tweets
     
+    [self.splitViewController.view setNeedsLayout];
     [self configureView];
 }
 
@@ -52,6 +56,18 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - TMTermDelegate
+
+- (void)tweetsDidUpdate {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.detailDescriptionLabel.text = [NSString stringWithFormat:@"%@", [self.term.tweets description]];
+    });
+}
+
+- (void)tweetsDidSave {
+    
 }
 
 #pragma mark - Split view
