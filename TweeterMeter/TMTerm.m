@@ -39,7 +39,10 @@
         [term fetchNumberOfTweets:10];
     }
     
-    NSLog(@"%lu", (unsigned long)term.tweets.count);
+    NSLog(@"Tweets loaded: %lu", (unsigned long)term.tweets.count);
+    term.popularWords = [NSMutableDictionary dictionary];
+    term.popularTags =  [NSMutableDictionary dictionary];
+    term.popularUsers = [NSMutableDictionary dictionary];
     
     return term;
 }
@@ -143,13 +146,54 @@
         tweet.text = [object valueForKey:@"text"];
         tweet.term = self.managedTerm;
         
+        // Analyze Tweet
+        [self analyzeTweet:tweet];
+        
         [self.tweets addObject:tweet];
     }
-    NSLog(@"%@", self.tweets);
     
     [self.delegate tweetsDidUpdate];
-    [self save];
-    [self.delegate tweetsDidSave];
+    if ([self save]) {
+        [self.delegate tweetsDidSave];
+    }
+}
+
+// Goes through tweet looking for certain words
+- (void)analyzeTweet: (Tweet *)tweet {
+    NSString *text = tweet.text;
+    NSMutableArray *words = (NSMutableArray *)[text componentsSeparatedByString:@" "];
+    if ([words containsObject:@""]) {
+        [words removeObjectIdenticalTo:@""];
+    }
+    NSNumber *old;
+    for (NSString *word in words) {
+        if (word.length != 0) {
+            if ([word characterAtIndex:0] == '#') {
+                old = [self.popularTags objectForKey:word];
+                if (old) {
+                    [self.popularTags setObject:@([old intValue]+1) forKey:word];
+                } else {
+                    [self.popularTags setObject:@1 forKey:word];
+                }
+            } else if ([word characterAtIndex:0] == '@') {
+                old = [self.popularUsers objectForKey:word];
+                if (old) {
+                    [self.popularUsers setObject:@([old intValue]+1) forKey:word];
+                } else {
+                    [self.popularUsers setObject:@1 forKey:word];
+                }
+            } else {
+                old = [self.popularWords objectForKey:word];
+                if (old) {
+                    [self.popularWords setObject:@([old intValue]+1) forKey:word];
+                } else {
+                    [self.popularWords setObject:@1 forKey:word];
+                }
+            }
+        }
+    }
+    
+    NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
 }
 
 - (BOOL)save {

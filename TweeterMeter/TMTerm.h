@@ -23,6 +23,10 @@
 @property (strong, nonatomic) NSNumber *maxID;
 @property (strong, nonatomic) NSNumber *minID;
 
+@property (strong, nonatomic) NSMutableDictionary *popularWords;
+@property (strong, nonatomic) NSMutableDictionary *popularTags;
+@property (strong, nonatomic) NSMutableDictionary *popularUsers;
+
 @property id <TMTermDelegate> delegate;
 
 + (TMTerm *) termFromManagedTerm:(Term *)managedTerm withContext:(NSManagedObjectContext *)context;

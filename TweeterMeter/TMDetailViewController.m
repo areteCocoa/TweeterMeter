@@ -38,7 +38,7 @@
 
     if (self.term) {
         self.navigationItem.title = self.term.name;
-        // self.detailDescriptionLabel.text = @"The Term has successfully loaded!";
+        self.detailDescriptionLabel.text = [NSString stringWithFormat:@"%@", [self.term.tweets description]];
     }
 }
 

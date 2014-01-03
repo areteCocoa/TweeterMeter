@@ -5,16 +5,16 @@
             <userInfo/>
         </attribute>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="tweets" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Tweet" inverseName="term" inverseEntity="Tweet" syncable="YES"/>
+        <relationship name="tweets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tweet" inverseName="term" inverseEntity="Tweet" syncable="YES"/>
         <userInfo/>
     </entity>
     <entity name="Tweet" representedClassName="Tweet" syncable="YES">
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Term" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="Tweet" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Term" positionX="0" positionY="0" width="128" height="90"/>
+        <element name="Tweet" positionX="234" positionY="45" width="128" height="90"/>
     </elements>
 </model>
