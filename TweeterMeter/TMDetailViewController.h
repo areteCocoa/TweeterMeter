@@ -9,9 +9,14 @@
 #import <UIKit/UIKit.h>
 #import <Social/Social.h>
 #import <Accounts/Accounts.h>
+
+#import "TMChartViewController.h"
+#import "TMFrequencyViewController.h"
+#import "TMDataTimelineViewController.h"
+
 #import "TMTerm.h"
 
-@interface TMDetailViewController : UIViewController <UISplitViewControllerDelegate, TMTermDelegate>
+@interface TMDetailViewController : UIViewController <UISplitViewControllerDelegate, UIPageViewControllerDataSource, TMTermDelegate>
 
 @property (strong, nonatomic) TMTerm *term;
 

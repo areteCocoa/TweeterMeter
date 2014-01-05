@@ -9,8 +9,14 @@
 #import "TMDetailViewController.h"
 
 @interface TMDetailViewController ()
+
+@property (strong, nonatomic) TMChartViewController *chartViewController;
+@property (strong, nonatomic) TMFrequencyViewController *frequencyViewController;
+@property (strong, nonatomic) TMDataTimelineViewController *dataViewController;
+
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 - (void)configureView;
+
 @end
 
 @implementation TMDetailViewController
@@ -35,7 +41,11 @@
 - (void)configureView
 {
     // Update the user interface for the detail item.
-
+    
+    self.chartViewController = [[TMChartViewController alloc] initWithTerm: self.term];
+    self.frequencyViewController = [[TMFrequencyViewController alloc] initWithTerm: self.term];
+    self.dataViewController = [[TMDataTimelineViewController alloc] initWithTerm: self.term];
+    
     if (self.term) {
         self.navigationItem.title = self.term.name;
         self.detailDescriptionLabel.text = [NSString stringWithFormat:@"%@", [self.term.tweets description]];
@@ -84,6 +94,28 @@
     // Called when the view is shown again in the split view, invalidating the button and popover controller.
     [self.navigationItem setLeftBarButtonItem:nil animated:YES];
     self.masterPopoverController = nil;
+}
+
+#pragma mark - UIPageViewDatasource
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
+    if (viewController == self.chartViewController) {
+        return self.frequencyViewController;
+    } else if (viewController == self.frequencyViewController) {
+        return self.dataViewController;
+    }
+    
+    return nil;
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
+    if (viewController == self.frequencyViewController) {
+        return self.chartViewController;
+    } else if (viewController == self.dataViewController) {
+        return self.frequencyViewController;
+    }
+    
+    return nil;
 }
 
 @end
