@@ -24,7 +24,7 @@
 }
 
 - (id)initWithTerm: (TMTerm *)term {
-    self = [self.storyboard instantiateViewControllerWithIdentifier:@"chart"];
+    self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"chart"];
     
     return self;
 }

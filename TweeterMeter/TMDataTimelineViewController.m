@@ -24,7 +24,7 @@
 }
 
 - (id)initWithTerm: (TMTerm *)term {
-    self = [self.storyboard instantiateViewControllerWithIdentifier:@"data"];
+    self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"data"];
     
     return self;
 }

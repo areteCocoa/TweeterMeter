@@ -24,7 +24,7 @@
 }
 
 - (id)initWithTerm: (TMTerm *)term {
-    self = [self.storyboard instantiateViewControllerWithIdentifier:@"frequency"];
+    self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"frequency"];
     
     return self;
 }

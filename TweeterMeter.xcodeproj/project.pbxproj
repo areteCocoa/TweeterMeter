@@ -12,7 +12,6 @@
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
 		549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18711878DCDF0017D41E /* TMFrequencyViewController.m */; };
 		549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */; };
-		549D18781878E61D0017D41E /* TMPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18771878E61D0017D41E /* TMPageViewController.m */; };
 		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
 		54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB518667C7B00EA5100 /* Foundation.framework */; };
 		54E0AFB818667C7B00EA5100 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */; };
@@ -56,8 +55,6 @@
 		549D18711878DCDF0017D41E /* TMFrequencyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMFrequencyViewController.m; sourceTree = "<group>"; };
 		549D18731878DCEC0017D41E /* TMDataTimelineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMDataTimelineViewController.h; sourceTree = "<group>"; };
 		549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMDataTimelineViewController.m; sourceTree = "<group>"; };
-		549D18761878E61D0017D41E /* TMPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMPageViewController.h; sourceTree = "<group>"; };
-		549D18771878E61D0017D41E /* TMPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMPageViewController.m; sourceTree = "<group>"; };
 		54D9C393186B64290078456B /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		54D9C394186B64290078456B /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		54E0AFB218667C7B00EA5100 /* TweeterMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TweeterMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,8 +151,6 @@
 				54E0AFC618667C7B00EA5100 /* TMAppDelegate.h */,
 				54E0AFC718667C7B00EA5100 /* TMAppDelegate.m */,
 				54E0AFC918667C7B00EA5100 /* Main.storyboard */,
-				549D18761878E61D0017D41E /* TMPageViewController.h */,
-				549D18771878E61D0017D41E /* TMPageViewController.m */,
 				54E0AFCF18667C7B00EA5100 /* TMMasterViewController.h */,
 				54E0AFD018667C7B00EA5100 /* TMMasterViewController.m */,
 				54E0AFD218667C7B00EA5100 /* TMDetailViewController.h */,
@@ -316,7 +311,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				549D18781878E61D0017D41E /* TMPageViewController.m in Sources */,
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */,

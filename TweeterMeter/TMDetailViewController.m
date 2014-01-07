@@ -13,6 +13,7 @@
 @property (strong, nonatomic) TMChartViewController *chartViewController;
 @property (strong, nonatomic) TMFrequencyViewController *frequencyViewController;
 @property (strong, nonatomic) TMDataTimelineViewController *dataViewController;
+@property (strong, nonatomic) NSArray *viewControllers;
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
 - (void)configureView;
@@ -41,10 +42,16 @@
 - (void)configureView
 {
     // Update the user interface for the detail item.
+    if (!self.chartViewController || !self.frequencyViewController || !self.dataViewController) {
+        self.chartViewController = [[TMChartViewController alloc] initWithTerm: self.term];
+        self.frequencyViewController = [[TMFrequencyViewController alloc] initWithTerm: self.term];
+        self.dataViewController = [[TMDataTimelineViewController alloc] initWithTerm: self.term];
+        self.viewControllers = @[self.chartViewController];
+    }
     
-    self.chartViewController = [[TMChartViewController alloc] initWithTerm: self.term];
-    self.frequencyViewController = [[TMFrequencyViewController alloc] initWithTerm: self.term];
-    self.dataViewController = [[TMDataTimelineViewController alloc] initWithTerm: self.term];
+    self.pageViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"page"];
+    self.pageViewController.dataSource = self;
+    [self.pageViewController setViewControllers:self.viewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     if (self.term) {
         self.navigationItem.title = self.term.name;
@@ -60,6 +67,12 @@
     
     [self.splitViewController.view setNeedsLayout];
     [self configureView];
+    
+    self.pageViewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    
+    [self addChildViewController:self.pageViewController];
+    [self.view addSubview:self.pageViewController.view];
+    [self.pageViewController didMoveToParentViewController:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -99,23 +112,56 @@
 #pragma mark - UIPageViewDatasource
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
-    if (viewController == self.chartViewController) {
-        return self.frequencyViewController;
-    } else if (viewController == self.frequencyViewController) {
-        return self.dataViewController;
+    NSUInteger index = [self indexOfViewController:viewController];
+    
+    
+    if (index == NSNotFound) {
+        return nil;
     }
     
-    return nil;
+    index++;
+    return [self viewControllerAtIndex:index];
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
-    if (viewController == self.frequencyViewController) {
-        return self.chartViewController;
-    } else if (viewController == self.dataViewController) {
-        return self.frequencyViewController;
+    NSUInteger index = [self indexOfViewController:viewController];
+    
+    if (index == NSNotFound || index == 0) {
+        return nil;
     }
     
+    index--;
+    return [self viewControllerAtIndex:index];
+}
+
+- (UIViewController *)viewControllerAtIndex: (NSUInteger)index {
+    if (index == 0) {
+        return self.chartViewController;
+    } else if (index == 1) {
+        return self.frequencyViewController;
+    } else if (index == 2) {
+        return self.dataViewController;
+    }
     return nil;
+}
+
+- (NSUInteger)indexOfViewController: (UIViewController *) viewController {
+    if (viewController == self.chartViewController) {
+        return 0;
+    } else if (viewController == self.frequencyViewController) {
+        return 1;
+    } else if (viewController == self.dataViewController) {
+        return 2;
+    }
+    return NSNotFound;
+}
+
+- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
+    return 3;
+}
+
+- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {
+    return 0;
 }
 
 @end
