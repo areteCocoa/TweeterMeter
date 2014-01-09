@@ -13,5 +13,6 @@
 @interface TMDataTimelineViewController : UIViewController
 
 - (id)initWithTerm: (TMTerm *)term;
+- (void)updateView;
 
 @end

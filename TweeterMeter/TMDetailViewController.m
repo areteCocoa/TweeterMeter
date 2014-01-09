@@ -55,7 +55,6 @@
     
     if (self.term) {
         self.navigationItem.title = self.term.name;
-        self.detailDescriptionLabel.text = [NSString stringWithFormat:@"%@", [self.term.tweets description]];
     }
 }
 
@@ -73,6 +72,8 @@
     [self addChildViewController:self.pageViewController];
     [self.view addSubview:self.pageViewController.view];
     [self.pageViewController didMoveToParentViewController:self];
+    
+    [self.pageViewController.view setNeedsDisplay];
 }
 
 - (void)didReceiveMemoryWarning
@@ -85,7 +86,10 @@
 
 - (void)tweetsDidUpdate {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.detailDescriptionLabel.text = [NSString stringWithFormat:@"%@", [self.term.tweets description]];
+        // Pass data to the VCs
+        [self.chartViewController updateView];
+        [self.frequencyViewController updateView];
+        [self.dataViewController updateView];
     });
 }
 

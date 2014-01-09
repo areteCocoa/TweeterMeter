@@ -8,10 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TMAppDelegate.h"
 #import "TMTerm.h"
+#import "XYPieChart.h"
 
-@interface TMChartViewController : UIViewController
+@interface TMChartViewController : UIViewController <XYPieChartDataSource, XYPieChartDelegate>
 
+@property (strong, nonatomic) IBOutlet XYPieChart *pieChart;
 - (id)initWithTerm: (TMTerm *)term;
+- (void)updateView;
 
 @end

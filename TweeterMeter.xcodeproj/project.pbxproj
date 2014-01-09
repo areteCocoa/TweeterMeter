@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5444FF5C187DD79500B8C225 /* XYPieChart.m in Sources */ = {isa = PBXBuildFile; fileRef = 5444FF5B187DD79500B8C225 /* XYPieChart.m */; };
+		5444FF5E187DDB6800B8C225 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5444FF5D187DDB6800B8C225 /* QuartzCore.framework */; };
 		547495DF18674D1900B969DB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547495DE18674D1900B969DB /* Social.framework */; };
 		547D1FEC186CB2E800BFBCEE /* Term.m in Sources */ = {isa = PBXBuildFile; fileRef = 547D1FEB186CB2E800BFBCEE /* Term.m */; };
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
@@ -46,6 +48,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5444FF5A187DD79500B8C225 /* XYPieChart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYPieChart.h; sourceTree = "<group>"; };
+		5444FF5B187DD79500B8C225 /* XYPieChart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYPieChart.m; sourceTree = "<group>"; };
+		5444FF5D187DDB6800B8C225 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		547495DE18674D1900B969DB /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		547D1FEA186CB2E800BFBCEE /* Term.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Term.h; sourceTree = "<group>"; };
 		547D1FEB186CB2E800BFBCEE /* Term.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Term.m; sourceTree = "<group>"; };
@@ -91,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5444FF5E187DDB6800B8C225 /* QuartzCore.framework in Frameworks */,
 				547495DF18674D1900B969DB /* Social.framework in Frameworks */,
 				54E0AFB818667C7B00EA5100 /* CoreGraphics.framework in Frameworks */,
 				54E0AFBC18667C7B00EA5100 /* CoreData.framework in Frameworks */,
@@ -113,6 +119,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5444FF59187DD79500B8C225 /* XYPieChart */ = {
+			isa = PBXGroup;
+			children = (
+				5444FF5A187DD79500B8C225 /* XYPieChart.h */,
+				5444FF5B187DD79500B8C225 /* XYPieChart.m */,
+			);
+			name = XYPieChart;
+			path = "../../../../Downloads/XYPieChart-master/XYPieChart";
+			sourceTree = "<group>";
+		};
 		54E0AFA918667C7B00EA5100 = {
 			isa = PBXGroup;
 			children = (
@@ -135,6 +151,7 @@
 		54E0AFB418667C7B00EA5100 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5444FF5D187DDB6800B8C225 /* QuartzCore.framework */,
 				547495DE18674D1900B969DB /* Social.framework */,
 				54E0AFB518667C7B00EA5100 /* Foundation.framework */,
 				54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */,
@@ -169,6 +186,7 @@
 				547D1FEB186CB2E800BFBCEE /* Term.m */,
 				54E0AFD518667C7B00EA5100 /* Images.xcassets */,
 				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
+				5444FF59187DD79500B8C225 /* XYPieChart */,
 				54F027451868DA0B007F3BD5 /* UIAlertView+Blocks */,
 				54E0AFBE18667C7B00EA5100 /* Supporting Files */,
 			);
@@ -313,6 +331,7 @@
 			files = (
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
+				5444FF5C187DD79500B8C225 /* XYPieChart.m in Sources */,
 				549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */,
 				54E0AFC418667C7B00EA5100 /* main.m in Sources */,
 				54E0AFD418667C7B00EA5100 /* TMDetailViewController.m in Sources */,

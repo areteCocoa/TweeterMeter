@@ -13,15 +13,19 @@
 #import "TMChartViewController.h"
 #import "TMFrequencyViewController.h"
 #import "TMDataTimelineViewController.h"
-
 #import "TMTerm.h"
+
+@protocol TMDetailSubController <NSObject>
+
+- (void)dataDidUpdate;
+
+@end
 
 @interface TMDetailViewController : UIViewController <UISplitViewControllerDelegate, UIPageViewControllerDataSource, TMTermDelegate>
 
 @property (strong, nonatomic) TMTerm *term;
 @property (strong, nonatomic) UIPageViewController *pageViewController;
 
-@property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
 @property (weak, nonatomic) IBOutlet UINavigationItem *detailNavigationItem;
 
 

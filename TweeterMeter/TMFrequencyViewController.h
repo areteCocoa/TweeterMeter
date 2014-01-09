@@ -13,5 +13,6 @@
 @interface TMFrequencyViewController : UIViewController
 
 - (id)initWithTerm: (TMTerm *)term;
+- (void)updateView;
 
 @end

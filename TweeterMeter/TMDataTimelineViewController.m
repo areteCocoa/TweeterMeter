@@ -14,19 +14,14 @@
 
 @implementation TMDataTimelineViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (id)initWithTerm: (TMTerm *)term {
     self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"data"];
     
     return self;
+}
+
+- (void)updateView {
+    // Update views
 }
 
 - (void)viewDidLoad

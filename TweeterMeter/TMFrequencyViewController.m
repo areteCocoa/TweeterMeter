@@ -10,23 +10,25 @@
 
 @interface TMFrequencyViewController ()
 
+@property (strong, nonatomic) TMTerm *term;
+
+@property (strong, nonatomic) IBOutlet UITextView *wordsTextView;
+@property (strong, nonatomic) IBOutlet UITextView *hashtagsTextView;
+@property (strong, nonatomic) IBOutlet UITextView *usersTextView;
+
 @end
 
 @implementation TMFrequencyViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
+- (id)initWithTerm: (TMTerm *)term {
+    self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"frequency"];
+    self.term = term;
+    
     return self;
 }
 
-- (id)initWithTerm: (TMTerm *)term {
-    self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"frequency"];
-    
-    return self;
+- (void)updateView {
+    // update views
 }
 
 - (void)viewDidLoad

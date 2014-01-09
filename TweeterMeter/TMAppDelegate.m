@@ -30,7 +30,7 @@
     UIPageControl *pageControl = [UIPageControl appearance];
     pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
     pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
-    pageControl.backgroundColor = [UIColor whiteColor];
+    pageControl.backgroundColor = [self.backgroundColor colorWithAlphaComponent:.5];
     
     return YES;
 }
@@ -75,6 +75,10 @@
             abort();
         } 
     }
+}
+
+- (UIColor *)backgroundColor {
+    return [UIColor colorWithRed:0 green:.7647 blue:1 alpha:1];
 }
 
 #pragma mark - Core Data stack
