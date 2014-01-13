@@ -11,7 +11,6 @@
 @interface TMChartViewController ()
 
 @property (strong, nonatomic) IBOutlet UITextView *tweetTextView;
-@property (strong, nonatomic) TMTerm *term;
 
 @end
 

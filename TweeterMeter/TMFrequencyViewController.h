@@ -12,6 +12,8 @@
 
 @interface TMFrequencyViewController : UIViewController
 
+@property (strong, nonatomic) TMTerm *term;
+
 - (id)initWithTerm: (TMTerm *)term;
 - (void)updateView;
 

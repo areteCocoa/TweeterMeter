@@ -15,6 +15,8 @@
 @interface TMChartViewController : UIViewController <XYPieChartDataSource, XYPieChartDelegate>
 
 @property (strong, nonatomic) IBOutlet XYPieChart *pieChart;
+@property (strong, nonatomic) TMTerm *term;
+
 - (id)initWithTerm: (TMTerm *)term;
 - (void)updateView;
 

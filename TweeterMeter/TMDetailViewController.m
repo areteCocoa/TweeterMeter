@@ -31,6 +31,10 @@
         term.delegate = self;
         _term = term;
         
+        self.chartViewController.term = term;
+        self.frequencyViewController.term = term;
+        self.dataViewController.term = term;
+        
         [self configureView];
     }
     
@@ -49,13 +53,17 @@
         self.viewControllers = @[self.chartViewController];
     }
     
-    self.pageViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"page"];
-    self.pageViewController.dataSource = self;
-    [self.pageViewController setViewControllers:self.viewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    if (!self.pageViewController) {
+        self.pageViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"page"];
+        self.pageViewController.dataSource = self;
+        [self.pageViewController setViewControllers:self.viewControllers direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    }
     
     if (self.term) {
         self.navigationItem.title = self.term.name;
     }
+    
+    [self updateSubviews];
 }
 
 - (void)viewDidLoad
@@ -82,14 +90,18 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)updateSubviews {
+    [self.chartViewController updateView];
+    [self.frequencyViewController updateView];
+    [self.dataViewController updateView];
+}
+
 #pragma mark - TMTermDelegate
 
 - (void)tweetsDidUpdate {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass data to the VCs
-        [self.chartViewController updateView];
-        [self.frequencyViewController updateView];
-        [self.dataViewController updateView];
+        [self updateSubviews];
     });
 }
 
