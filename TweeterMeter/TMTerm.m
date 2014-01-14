@@ -103,11 +103,11 @@
                                       [self addTweets:[NSSet setWithArray:statuses]];
                                   }
                                   
-                                  /*
+                                  
                                   dispatch_async(dispatch_get_main_queue(), ^{
-                                      // self.detailDescriptionLabel.text = detailString;
+                                      // Do something on the main thread
                                   });
-                                   */
+                                   
                               }
                               else {
                                   // Our JSON deserialization went awry
@@ -140,7 +140,6 @@
 - (void)addTweets:(NSSet *)objects {
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:_context];
     for (id object in objects) {
-        // NSLog(@"%@: %@", [object class], object);
         Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:_context];
         tweet.user = [[object valueForKey:@"user"] valueForKey:@"name"];
         tweet.text = [object valueForKey:@"text"];

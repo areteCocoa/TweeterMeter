@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="FrequencyWord" representedClassName="FrequencyWord" syncable="YES">
+        <attribute name="frequency" optional="YES" attributeType="Integer 64" minValueString="0" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="parentWord" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="frequencyWord" inverseEntity="Word" syncable="YES"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="words" inverseEntity="Term" syncable="YES"/>
+    </entity>
     <entity name="Term" representedClassName="Term">
         <attribute name="creationTime" optional="YES" attributeType="Date">
             <userInfo/>
         </attribute>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="tweets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tweet" inverseName="term" inverseEntity="Tweet" syncable="YES"/>
+        <relationship name="words" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyWord" inverseName="term" inverseEntity="FrequencyWord" syncable="YES"/>
         <userInfo/>
     </entity>
     <entity name="Tweet" representedClassName="Tweet" syncable="YES">
@@ -13,12 +20,15 @@
         <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
     </entity>
-    <entity name="Word" syncable="YES">
+    <entity name="Word" representedClassName="Word" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="frequencyWord" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyWord" inverseName="parentWord" inverseEntity="FrequencyWord" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Term" positionX="0" positionY="0" width="128" height="88"/>
-        <element name="Tweet" positionX="234" positionY="45" width="128" height="90"/>
-        <element name="Word" positionX="234" positionY="149" width="128" height="58"/>
+        <element name="Term" positionX="-189" positionY="0" width="128" height="103"/>
+        <element name="Tweet" positionX="7" positionY="-162" width="128" height="90"/>
+        <element name="Word" positionX="25" positionY="279" width="128" height="88"/>
+        <element name="FrequencyWord" positionX="9" positionY="153" width="128" height="103"/>
     </elements>
 </model>

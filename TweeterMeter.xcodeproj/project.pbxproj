@@ -14,6 +14,8 @@
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
 		549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18711878DCDF0017D41E /* TMFrequencyViewController.m */; };
 		549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */; };
+		54C32BF71885B6F00072B339 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 54C32BF61885B6F00072B339 /* Word.m */; };
+		54C32BFA1885B6F00072B339 /* FrequencyWord.m in Sources */ = {isa = PBXBuildFile; fileRef = 54C32BF91885B6F00072B339 /* FrequencyWord.m */; };
 		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
 		54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB518667C7B00EA5100 /* Foundation.framework */; };
 		54E0AFB818667C7B00EA5100 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */; };
@@ -60,6 +62,10 @@
 		549D18711878DCDF0017D41E /* TMFrequencyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMFrequencyViewController.m; sourceTree = "<group>"; };
 		549D18731878DCEC0017D41E /* TMDataTimelineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMDataTimelineViewController.h; sourceTree = "<group>"; };
 		549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMDataTimelineViewController.m; sourceTree = "<group>"; };
+		54C32BF51885B6F00072B339 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Word.h; sourceTree = "<group>"; };
+		54C32BF61885B6F00072B339 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Word.m; sourceTree = "<group>"; };
+		54C32BF81885B6F00072B339 /* FrequencyWord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyWord.h; sourceTree = "<group>"; };
+		54C32BF91885B6F00072B339 /* FrequencyWord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyWord.m; sourceTree = "<group>"; };
 		54D9C393186B64290078456B /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		54D9C394186B64290078456B /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		54E0AFB218667C7B00EA5100 /* TweeterMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TweeterMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -180,12 +186,16 @@
 				549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */,
 				54F027421868D9F7007F3BD5 /* TMTerm.h */,
 				54F027431868D9F7007F3BD5 /* TMTerm.m */,
+				54E0AFD518667C7B00EA5100 /* Images.xcassets */,
+				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
+				54C32BF81885B6F00072B339 /* FrequencyWord.h */,
+				54C32BF91885B6F00072B339 /* FrequencyWord.m */,
+				54C32BF51885B6F00072B339 /* Word.h */,
+				54C32BF61885B6F00072B339 /* Word.m */,
 				54D9C393186B64290078456B /* Tweet.h */,
 				54D9C394186B64290078456B /* Tweet.m */,
 				547D1FEA186CB2E800BFBCEE /* Term.h */,
 				547D1FEB186CB2E800BFBCEE /* Term.m */,
-				54E0AFD518667C7B00EA5100 /* Images.xcassets */,
-				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
 				5444FF59187DD79500B8C225 /* XYPieChart */,
 				54F027451868DA0B007F3BD5 /* UIAlertView+Blocks */,
 				54E0AFBE18667C7B00EA5100 /* Supporting Files */,
@@ -331,6 +341,7 @@
 			files = (
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
+				54C32BFA1885B6F00072B339 /* FrequencyWord.m in Sources */,
 				5444FF5C187DD79500B8C225 /* XYPieChart.m in Sources */,
 				549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */,
 				54E0AFC418667C7B00EA5100 /* main.m in Sources */,
@@ -342,6 +353,7 @@
 				547D1FEC186CB2E800BFBCEE /* Term.m in Sources */,
 				54E0AFC818667C7B00EA5100 /* TMAppDelegate.m in Sources */,
 				54E0AFD118667C7B00EA5100 /* TMMasterViewController.m in Sources */,
+				54C32BF71885B6F00072B339 /* Word.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,5 +15,6 @@
 @dynamic creationTime;
 @dynamic name;
 @dynamic tweets;
+@dynamic words;
 
 @end
