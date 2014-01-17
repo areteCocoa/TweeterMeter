@@ -10,10 +10,10 @@
 		5444FF5C187DD79500B8C225 /* XYPieChart.m in Sources */ = {isa = PBXBuildFile; fileRef = 5444FF5B187DD79500B8C225 /* XYPieChart.m */; };
 		5444FF5E187DDB6800B8C225 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5444FF5D187DDB6800B8C225 /* QuartzCore.framework */; };
 		547495DF18674D1900B969DB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547495DE18674D1900B969DB /* Social.framework */; };
-		547D1FEC186CB2E800BFBCEE /* Term.m in Sources */ = {isa = PBXBuildFile; fileRef = 547D1FEB186CB2E800BFBCEE /* Term.m */; };
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
 		549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18711878DCDF0017D41E /* TMFrequencyViewController.m */; };
 		549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */; };
+		54C234691888590E0033ECB0 /* Term.m in Sources */ = {isa = PBXBuildFile; fileRef = 54C234681888590E0033ECB0 /* Term.m */; };
 		54C32BF71885B6F00072B339 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 54C32BF61885B6F00072B339 /* Word.m */; };
 		54C32BFA1885B6F00072B339 /* FrequencyWord.m in Sources */ = {isa = PBXBuildFile; fileRef = 54C32BF91885B6F00072B339 /* FrequencyWord.m */; };
 		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
@@ -54,14 +54,14 @@
 		5444FF5B187DD79500B8C225 /* XYPieChart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYPieChart.m; sourceTree = "<group>"; };
 		5444FF5D187DDB6800B8C225 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		547495DE18674D1900B969DB /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
-		547D1FEA186CB2E800BFBCEE /* Term.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Term.h; sourceTree = "<group>"; };
-		547D1FEB186CB2E800BFBCEE /* Term.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Term.m; sourceTree = "<group>"; };
 		549D186D1878DCB70017D41E /* TMChartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMChartViewController.h; sourceTree = "<group>"; };
 		549D186E1878DCB70017D41E /* TMChartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMChartViewController.m; sourceTree = "<group>"; };
 		549D18701878DCDF0017D41E /* TMFrequencyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMFrequencyViewController.h; sourceTree = "<group>"; };
 		549D18711878DCDF0017D41E /* TMFrequencyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMFrequencyViewController.m; sourceTree = "<group>"; };
 		549D18731878DCEC0017D41E /* TMDataTimelineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMDataTimelineViewController.h; sourceTree = "<group>"; };
 		549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMDataTimelineViewController.m; sourceTree = "<group>"; };
+		54C234671888590E0033ECB0 /* Term.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Term.h; sourceTree = "<group>"; };
+		54C234681888590E0033ECB0 /* Term.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Term.m; sourceTree = "<group>"; };
 		54C32BF51885B6F00072B339 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Word.h; sourceTree = "<group>"; };
 		54C32BF61885B6F00072B339 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Word.m; sourceTree = "<group>"; };
 		54C32BF81885B6F00072B339 /* FrequencyWord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyWord.h; sourceTree = "<group>"; };
@@ -194,8 +194,8 @@
 				54C32BF61885B6F00072B339 /* Word.m */,
 				54D9C393186B64290078456B /* Tweet.h */,
 				54D9C394186B64290078456B /* Tweet.m */,
-				547D1FEA186CB2E800BFBCEE /* Term.h */,
-				547D1FEB186CB2E800BFBCEE /* Term.m */,
+				54C234671888590E0033ECB0 /* Term.h */,
+				54C234681888590E0033ECB0 /* Term.m */,
 				5444FF59187DD79500B8C225 /* XYPieChart */,
 				54F027451868DA0B007F3BD5 /* UIAlertView+Blocks */,
 				54E0AFBE18667C7B00EA5100 /* Supporting Files */,
@@ -339,6 +339,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54C234691888590E0033ECB0 /* Term.m in Sources */,
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				54C32BFA1885B6F00072B339 /* FrequencyWord.m in Sources */,
@@ -350,7 +351,6 @@
 				549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */,
 				54F027441868D9F7007F3BD5 /* TMTerm.m in Sources */,
 				54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */,
-				547D1FEC186CB2E800BFBCEE /* Term.m in Sources */,
 				54E0AFC818667C7B00EA5100 /* TMAppDelegate.m in Sources */,
 				54E0AFD118667C7B00EA5100 /* TMMasterViewController.m in Sources */,
 				54C32BF71885B6F00072B339 /* Word.m in Sources */,

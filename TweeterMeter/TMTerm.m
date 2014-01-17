@@ -25,16 +25,13 @@
     term.managedTerm = managedTerm;
     term.context = context;
     
-    id name = managedTerm.name;
-    if ([name isKindOfClass:[NSString class]]) {
-        term.name = name;
-    }
+    term.name = managedTerm.name;
     
     term.tweets = [NSMutableSet set];
-    id tweets = managedTerm.tweets;
-    if ([tweets isKindOfClass:[NSSet class]]) {
-        term.tweets = [tweets mutableCopy];
-    }
+    term.tweets = [managedTerm.tweets mutableCopy];
+    
+    term.frequencyWords = [managedTerm.frequencyWords mutableCopy];
+    
     if (!term.tweets || term.tweets.count < 10) {
         [term fetchNumberOfTweets:10];
     }
@@ -116,8 +113,8 @@
                           }
                           else {
                               // The server did not respond ... were we rate-limited?
-                              NSLog(@"The response status code is %d",
-                                    urlResponse.statusCode);
+                              NSLog(@"The response status code is %ld",
+                                    (long)urlResponse.statusCode);
                           }
                       }
                   }];
@@ -165,34 +162,74 @@
         [words removeObjectIdenticalTo:@""];
     }
     NSNumber *old;
-    for (NSString *word in words) {
-        if (word.length != 0) {
-            if ([word characterAtIndex:0] == '#') {
-                old = [self.popularTags objectForKey:word];
+    NSString *wordString;
+    
+    for (NSUInteger index = 0; index < words.count; index++) {
+        wordString = words[index];
+        if (wordString.length != 0) {
+            NSLog(@"%@", [self getFrequencyWordWithName:wordString]);
+            
+            if ([wordString characterAtIndex:0] == '#') {
+                old = [self.popularTags objectForKey:wordString];
                 if (old) {
-                    [self.popularTags setObject:@([old intValue]+1) forKey:word];
+                    [self.popularTags setObject:@([old intValue]+1) forKey:wordString];
                 } else {
-                    [self.popularTags setObject:@1 forKey:word];
+                    [self.popularTags setObject:@1 forKey:wordString];
                 }
-            } else if ([word characterAtIndex:0] == '@') {
-                old = [self.popularUsers objectForKey:word];
+            } else if ([wordString characterAtIndex:0] == '@') {
+                old = [self.popularUsers objectForKey:wordString];
                 if (old) {
-                    [self.popularUsers setObject:@([old intValue]+1) forKey:word];
+                    [self.popularUsers setObject:@([old intValue]+1) forKey:wordString];
                 } else {
-                    [self.popularUsers setObject:@1 forKey:word];
+                    [self.popularUsers setObject:@1 forKey:wordString];
                 }
             } else {
-                old = [self.popularWords objectForKey:word];
+                old = [self.popularWords objectForKey:wordString];
                 if (old) {
-                    [self.popularWords setObject:@([old intValue]+1) forKey:word];
+                    [self.popularWords setObject:@([old intValue]+1) forKey:wordString];
                 } else {
-                    [self.popularWords setObject:@1 forKey:word];
+                    [self.popularWords setObject:@1 forKey:wordString];
                 }
             }
         }
     }
     
     NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
+}
+
+- (FrequencyWord *)getFrequencyWordWithName: (NSString *)name {
+    FrequencyWord *word;
+    
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"FrequencyWord" inManagedObjectContext:self.context];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setEntity:entity];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", name];
+    [fetchRequest setPredicate:predicate];
+    
+    NSError *error;
+    NSArray *objects = [self.context executeFetchRequest:fetchRequest error:&error];
+    if (error) {
+        NSLog(@"Error retreiving objects: %@", error);
+    } else if (objects.count == 0) {
+        // Create new FrequencyWord
+        Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+        
+        word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:self.context];
+        word.name = name;
+        word.frequency = @1;
+        word.term = self.managedTerm;
+        
+        word.parentWord = parentWord;
+        [parentWord addFrequencyWordObject:word];
+        
+    } else if (objects.count != 1) {
+        NSLog(@"Objects retreived is greater than expected: %lu objects", (unsigned long)objects.count);
+    } else {
+        word = [objects firstObject];
+    }
+    
+    return word;
 }
 
 - (BOOL)save {

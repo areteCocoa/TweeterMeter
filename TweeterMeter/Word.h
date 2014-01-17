@@ -9,12 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+#import "TMAppDelegate.h"
 
 @interface Word : NSManagedObject
 
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * type;
 @property (nonatomic, retain) NSSet *frequencyWord;
+
++ (Word *)fetchWordWithName: (NSString *)name inContext:(NSManagedObjectContext *)context;
+
 @end
 
 @interface Word (CoreDataGeneratedAccessors)

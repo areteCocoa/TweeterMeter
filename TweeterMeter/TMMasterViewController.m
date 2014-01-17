@@ -57,7 +57,7 @@
     nameAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     nameAlertView.tapBlock = ^(UIAlertView *alertView, NSInteger buttonIndex) {
         if (buttonIndex == 0) {
-            NSLog(@"Cancel");
+            // Delete object from table
         } else if (buttonIndex == 1) {
             NSString *entry = [alertView textFieldAtIndex:0].text;
             [newManagedObject setValue:entry forKey:@"name"];

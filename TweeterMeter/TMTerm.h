@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Term.h"
 #import "FrequencyWord.h"
+#import "Word.h"
 
 @protocol TMTermDelegate <NSObject>
 
@@ -21,8 +22,9 @@
 
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSMutableSet *tweets;
-@property (strong, nonatomic) NSNumber *maxID;
-@property (strong, nonatomic) NSNumber *minID;
+@property (strong, nonatomic) NSMutableSet *frequencyWords;
+@property (strong, nonatomic) NSMutableSet *frequencyTags;
+@property (strong, nonatomic) NSMutableSet *frequencyUsers;
 
 @property (strong, nonatomic) NSMutableDictionary *popularWords;
 @property (strong, nonatomic) NSMutableDictionary *popularTags;
