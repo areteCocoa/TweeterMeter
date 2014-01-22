@@ -1,5 +1,5 @@
 //
-//  FrequencyWord.h
+//  FrequencyTag.h
 //  TweeterMeter
 //
 //  Created by Thomas Ring on 1/22/14.
@@ -12,7 +12,7 @@
 
 @class Term, Word;
 
-@interface FrequencyWord : FrequencyObject
+@interface FrequencyTag : FrequencyObject
 
 @property (nonatomic, retain) Word *parentWord;
 @property (nonatomic, retain) Term *term;

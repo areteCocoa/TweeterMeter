@@ -2,18 +2,22 @@
 //  Word.m
 //  TweeterMeter
 //
-//  Created by Thomas Ring on 1/14/14.
+//  Created by Thomas Ring on 1/22/14.
 //  Copyright (c) 2014 Thomas Ring. All rights reserved.
 //
 
 #import "Word.h"
+#import "FrequencyObject.h"
 
 
 @implementation Word
 
+@dynamic isHashtag;
+@dynamic isUser;
 @dynamic name;
 @dynamic type;
-@dynamic frequencyWord;
+@dynamic isWord;
+@dynamic frequencyObject;
 
 + (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context{
     Word *word;

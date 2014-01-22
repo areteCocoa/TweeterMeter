@@ -2,30 +2,33 @@
 //  Word.h
 //  TweeterMeter
 //
-//  Created by Thomas Ring on 1/14/14.
+//  Created by Thomas Ring on 1/22/14.
 //  Copyright (c) 2014 Thomas Ring. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-#import "TMAppDelegate.h"
+@class FrequencyObject;
 
 @interface Word : NSManagedObject
 
+@property (nonatomic, retain) NSNumber * isHashtag;
+@property (nonatomic, retain) NSNumber * isUser;
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * type;
-@property (nonatomic, retain) NSSet *frequencyWord;
+@property (nonatomic, retain) NSNumber * isWord;
+@property (nonatomic, retain) NSSet *frequencyObject;
 
-+ (Word *)fetchWordWithName: (NSString *)name inContext:(NSManagedObjectContext *)context;
++ (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context;
 
 @end
 
 @interface Word (CoreDataGeneratedAccessors)
 
-- (void)addFrequencyWordObject:(NSManagedObject *)value;
-- (void)removeFrequencyWordObject:(NSManagedObject *)value;
-- (void)addFrequencyWord:(NSSet *)values;
-- (void)removeFrequencyWord:(NSSet *)values;
+- (void)addFrequencyObjectObject:(FrequencyObject *)value;
+- (void)removeFrequencyObjectObject:(FrequencyObject *)value;
+- (void)addFrequencyObject:(NSSet *)values;
+- (void)removeFrequencyObject:(NSSet *)values;
 
 @end

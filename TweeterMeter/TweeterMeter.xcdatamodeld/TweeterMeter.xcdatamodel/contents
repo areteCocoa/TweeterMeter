@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="FrequencyTag" syncable="YES">
+    <entity name="FrequencyObject" representedClassName="FrequencyObject" isAbstract="YES" syncable="YES">
         <attribute name="frequency" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="parentWord" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="frequencyTag" inverseEntity="Word" syncable="YES"/>
+        <relationship name="parentWord" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="frequencyObject" inverseEntity="Word" syncable="YES"/>
+    </entity>
+    <entity name="FrequencyTag" representedClassName="FrequencyTag" parentEntity="FrequencyObject" syncable="YES">
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="frequencyTags" inverseEntity="Term" syncable="YES"/>
     </entity>
-    <entity name="FrequencyUser" syncable="YES">
-        <attribute name="frequency" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="parentWord" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="frequencyUser" inverseEntity="Word" syncable="YES"/>
+    <entity name="FrequencyUser" representedClassName="FrequencyUser" parentEntity="FrequencyObject" syncable="YES">
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="frequencyUsers" inverseEntity="Term" syncable="YES"/>
     </entity>
-    <entity name="FrequencyWord" representedClassName="FrequencyWord" syncable="YES">
-        <attribute name="frequency" optional="YES" attributeType="Integer 64" minValueString="0" defaultValueString="0" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="parentWord" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="frequencyWord" inverseEntity="Word" syncable="YES"/>
+    <entity name="FrequencyWord" representedClassName="FrequencyWord" parentEntity="FrequencyObject" syncable="YES">
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="frequencyWords" inverseEntity="Term" syncable="YES"/>
     </entity>
     <entity name="Term" representedClassName="Term">
@@ -41,18 +37,18 @@
     <entity name="Word" representedClassName="Word" syncable="YES">
         <attribute name="isHashtag" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="isUser" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isWord" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="frequencyTag" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyTag" inverseName="parentWord" inverseEntity="FrequencyTag" syncable="YES"/>
-        <relationship name="frequencyUser" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyUser" inverseName="parentWord" inverseEntity="FrequencyUser" syncable="YES"/>
-        <relationship name="frequencyWord" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyWord" inverseName="parentWord" inverseEntity="FrequencyWord" syncable="YES"/>
+        <relationship name="frequencyObject" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyObject" inverseName="parentWord" inverseEntity="FrequencyObject" syncable="YES"/>
     </entity>
     <elements>
-        <element name="FrequencyWord" positionX="-90" positionY="266" width="128" height="103"/>
+        <element name="FrequencyTag" positionX="-461" positionY="306" width="128" height="58"/>
+        <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="58"/>
+        <element name="FrequencyWord" positionX="-90" positionY="266" width="128" height="58"/>
         <element name="Term" positionX="-324" positionY="18" width="128" height="193"/>
         <element name="Tweet" positionX="-90" positionY="18" width="128" height="90"/>
-        <element name="Word" positionX="-252" positionY="449" width="128" height="148"/>
-        <element name="FrequencyTag" positionX="-461" positionY="306" width="128" height="103"/>
-        <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="103"/>
+        <element name="Word" positionX="-272" positionY="467" width="128" height="133"/>
+        <element name="FrequencyObject" positionX="-594" positionY="486" width="128" height="88"/>
     </elements>
 </model>

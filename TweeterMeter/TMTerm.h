@@ -22,9 +22,10 @@
 
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSMutableSet *tweets;
-@property (strong, nonatomic) NSMutableSet *frequencyWords;
-@property (strong, nonatomic) NSMutableSet *frequencyTags;
-@property (strong, nonatomic) NSMutableSet *frequencyUsers;
+
+@property (strong, nonatomic) NSMutableDictionary *frequencyWords;
+@property (strong, nonatomic) NSMutableDictionary *frequencyTags;
+@property (strong, nonatomic) NSMutableDictionary *frequencyUsers;
 
 @property (strong, nonatomic) NSMutableDictionary *popularWords;
 @property (strong, nonatomic) NSMutableDictionary *popularTags;

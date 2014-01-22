@@ -1,5 +1,5 @@
 //
-//  FrequencyWord.h
+//  FrequencyObject.h
 //  TweeterMeter
 //
 //  Created by Thomas Ring on 1/22/14.
@@ -8,13 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#import "FrequencyObject.h"
 
-@class Term, Word;
+@class Word;
 
-@interface FrequencyWord : FrequencyObject
+@interface FrequencyObject : NSManagedObject
 
+@property (nonatomic, retain) NSNumber * frequency;
+@property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) Word *parentWord;
-@property (nonatomic, retain) Term *term;
 
 @end
