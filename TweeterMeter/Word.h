@@ -15,10 +15,11 @@
 
 @property (nonatomic, retain) NSNumber * isHashtag;
 @property (nonatomic, retain) NSNumber * isUser;
+@property (nonatomic, retain) NSNumber * isWord;
+@property (nonatomic, retain) NSNumber * isValid;
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * type;
-@property (nonatomic, retain) NSNumber * isWord;
-@property (nonatomic, retain) NSSet *frequencyObject;
+@property (nonatomic, retain) NSSet * frequencyObject;
 
 + (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context;
 

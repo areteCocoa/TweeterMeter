@@ -37,18 +37,19 @@
     <entity name="Word" representedClassName="Word" syncable="YES">
         <attribute name="isHashtag" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="isUser" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isValid" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="isWord" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="frequencyObject" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyObject" inverseName="parentWord" inverseEntity="FrequencyObject" syncable="YES"/>
     </entity>
     <elements>
+        <element name="FrequencyObject" positionX="-594" positionY="486" width="128" height="88"/>
         <element name="FrequencyTag" positionX="-461" positionY="306" width="128" height="58"/>
         <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="58"/>
         <element name="FrequencyWord" positionX="-90" positionY="266" width="128" height="58"/>
         <element name="Term" positionX="-324" positionY="18" width="128" height="193"/>
         <element name="Tweet" positionX="-90" positionY="18" width="128" height="90"/>
-        <element name="Word" positionX="-272" positionY="467" width="128" height="133"/>
-        <element name="FrequencyObject" positionX="-594" positionY="486" width="128" height="88"/>
+        <element name="Word" positionX="-272" positionY="467" width="128" height="148"/>
     </elements>
 </model>

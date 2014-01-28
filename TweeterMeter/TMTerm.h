@@ -33,7 +33,7 @@
 
 @property id <TMTermDelegate> delegate;
 
-+ (TMTerm *) termFromManagedTerm:(Term *)managedTerm withContext:(NSManagedObjectContext *)context;
+- (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context;
 
 - (void)fetchNumberOfTweets:(int)number;
 

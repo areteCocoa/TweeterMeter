@@ -99,14 +99,14 @@
 #pragma mark - TMTermDelegate
 
 - (void)tweetsDidUpdate {
+    
+}
+
+- (void)tweetsDidSave {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass data to the VCs
         [self updateSubviews];
     });
-}
-
-- (void)tweetsDidSave {
-    
 }
 
 #pragma mark - Split view

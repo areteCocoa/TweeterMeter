@@ -32,6 +32,7 @@
 
 - (void)updateView {
     // update views
+    
     self.wordsTextView.text = [self.term.popularWords description];
     self.hashtagsTextView.text = [self.term.popularTags description];
     self.usersTextView.text = [self.term.popularUsers description];

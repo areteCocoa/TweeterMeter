@@ -129,7 +129,8 @@
     
     if ([object isMemberOfClass:[Term class]]) {
         Term *managedTerm = (Term *)object;
-        self.detailViewController.term = [TMTerm termFromManagedTerm:managedTerm withContext:self.managedObjectContext];
+        
+        self.detailViewController.term = [[TMTerm alloc] initTermWithManagedTerm:managedTerm withContext:self.managedObjectContext];
     }
 }
 

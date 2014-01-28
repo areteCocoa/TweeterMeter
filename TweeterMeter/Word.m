@@ -14,9 +14,10 @@
 
 @dynamic isHashtag;
 @dynamic isUser;
+@dynamic isWord;
+@dynamic isValid;
 @dynamic name;
 @dynamic type;
-@dynamic isWord;
 @dynamic frequencyObject;
 
 + (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context{
@@ -30,7 +31,14 @@
     [fetch setPredicate:predicate];
     
     NSError *error;
-    NSArray *objects = [context executeFetchRequest:fetch error:&error];
+    NSArray *objects;
+    @try {
+        objects = [context executeFetchRequest:fetch error:&error];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Exception: %@", exception);
+    }
+    
     if (error) {
         NSLog(@"Error");
     }
@@ -41,8 +49,25 @@
     if (!word) {
         word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
         word.name = name;
+        
+        char firstChar = [name characterAtIndex:0];
+        if ( firstChar == '\\' ) {
+            word.isValid = NO;
+        } else if (firstChar == '#') {
+            word.isHashtag = @1;
+        } else if (firstChar == '@') {
+            word.isUser = @1;
+        } else {
+            word.isWord = @1;
+        }
         // find type of word
         
+    }
+    
+    if ([name characterAtIndex:0] == '@') {
+        word.isUser = @1;
+    } else if ([name characterAtIndex:0] == '#') {
+        word.isHashtag = @1;
     }
     
     return word;
