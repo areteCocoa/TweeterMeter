@@ -13,43 +13,29 @@
 
 @interface TMTerm()
 
-@property (strong, nonatomic) Term *managedTerm;
-@property (strong, nonatomic) NSManagedObjectContext *context;
+@property (strong, nonatomic, readonly) Term *managedTerm;
+@property (strong, nonatomic, readonly) NSManagedObjectContext *context;
+
+@property (strong, nonatomic) NSEntityDescription *entity;
+@property (strong, nonatomic) NSPersistentStoreCoordinator *store;
+
+@property (strong, nonatomic) NSTimer *timer;
+@property (strong, nonatomic) NSOperationQueue *queue;
 
 @end
 
 @implementation TMTerm
 
+@synthesize context = _context, managedTerm = _managedTerm;
+
 - (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context {
-    self.managedTerm = managedTerm;
-    self.context = [[NSManagedObjectContext alloc] init];
-    [self.context setPersistentStoreCoordinator:[context persistentStoreCoordinator]];
-    
-    if (self.managedTerm.managedObjectContext != self.context) {
-        NSEntityDescription *entity = managedTerm.entity;
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        request.entity = entity;
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", managedTerm.name];
-        request.predicate = predicate;
-        
-        NSError *error;
-        NSArray *results = [self.context executeFetchRequest:request error:&error];
-        if (!error && results && results.count == 1 && [[results firstObject] isKindOfClass:[Term class]]) {
-            self.managedTerm = [results firstObject];
-        } else{
-            if (error) {
-                NSLog(@"%@", error);
-            }
-        }
-    }
+    self.entity = managedTerm.entity;
+    self.store = context.persistentStoreCoordinator;
     
     self.name = managedTerm.name;
     
     self.tweets = [NSMutableSet set];
     self.tweets = [managedTerm.tweets mutableCopy];
-    
-    [self fetchNumberOfTweets:100];
     
     self.popularWords = [NSMutableDictionary dictionary];
     self.popularTags =  [NSMutableDictionary dictionary];
@@ -95,89 +81,50 @@
     
     // NSLog(@"Tweets loaded: %lu", (unsigned long)term.tweets.count);
     
+    // [self startAutoFetchingTweets];
+    NSManagedObjectContext *newContext = [[NSManagedObjectContext alloc] init];
+    [newContext setPersistentStoreCoordinator:self.store];
+    [self fetchNumberOfTweets:100 withContext:newContext];
+    
     return self;
 }
 
 /*
-+ (TMTerm *) termFromManagedTerm:(Term *)managedTerm withContext:(NSManagedObjectContext *)context {
-    TMTerm *term = [[TMTerm alloc] init];
-    term.managedTerm = managedTerm;
-    term.context = [[NSManagedObjectContext alloc] init];
-    [term.context setPersistentStoreCoordinator:[context persistentStoreCoordinator]];
-    
-    if (term.managedTerm.managedObjectContext != term.context) {
-        NSEntityDescription *entity = managedTerm.entity;
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        request.entity = entity;
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", managedTerm.name];
-        request.predicate = predicate;
-        
-        NSError *error;
-        NSArray *results = [term.context executeFetchRequest:request error:&error];
-        if (!error && results && results.count == 1 && [[results firstObject] isKindOfClass:[Term class]]) {
-            term.managedTerm = [results firstObject];
-        } else{
-            if (error) {
-                NSLog(@"%@", error);
-            }
-        }
+- (void)startAutoFetchingTweets {
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(addFetchOperation) userInfo:nil repeats:YES];
+}
+
+- (void)addFetchOperation {
+    if (!self.queue) {
+        self.queue = [[NSOperationQueue alloc] init];
+        self.queue.maxConcurrentOperationCount = 1;
     }
-    
-    term.name = managedTerm.name;
-    
-    term.tweets = [NSMutableSet set];
-    term.tweets = [managedTerm.tweets mutableCopy];
-    
-    [term fetchNumberOfTweets:100];
-    
-    term.popularWords = [NSMutableDictionary dictionary];
-    term.popularTags =  [NSMutableDictionary dictionary];
-    term.popularUsers = [NSMutableDictionary dictionary];
-    
-    NSNumber *oldValue;
-    
-    term.frequencyWords = [NSMutableDictionary dictionary];
-    for (FrequencyWord* word in managedTerm.frequencyWords) {
-        [term.frequencyWords setObject:word forKey:word.name];
-        
-        oldValue = [term.popularWords objectForKey:word.name];
-        if (!oldValue) {
-            [term.popularWords setObject:@1 forKey:word.name];
-        } else {
-            [term.popularWords setObject:@([oldValue intValue] + 1) forKey:word.name];
-        }
-    }
-    
-    term.frequencyTags = [NSMutableDictionary dictionary];
-    for (FrequencyWord* tag in managedTerm.frequencyTags) {
-        [term.frequencyTags setObject:tag forKey:tag.name];
-        
-        oldValue = [term.popularWords objectForKey:tag.name];
-        if (!oldValue) {
-            [term.popularWords setObject:@1 forKey:tag.name];
-        } else {
-            [term.popularWords setObject:@([oldValue intValue] + 1) forKey:tag.name];
-        }
-    }
-    
-    term.frequencyUsers = [NSMutableDictionary dictionary];
-    for (FrequencyWord* user in managedTerm.frequencyUsers) {
-        [term.frequencyUsers setObject:user forKey:user.name];
-        
-        oldValue = [term.popularWords objectForKey:user.name];
-        if (!oldValue) {
-            [term.popularWords setObject:@1 forKey:user.name];
-        } else {
-            [term.popularWords setObject:@([oldValue intValue] + 1) forKey:user.name];
-        }
-    }
-    
-    // NSLog(@"Tweets loaded: %lu", (unsigned long)term.tweets.count);
-    
-    return term;
+    NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(fetchNumberOfTweets:withContext:) object:@[];
+    [self.queue addOperation:operation];
+}
+
+- (void)stopAutoFetchingTweets {
+    [self.timer invalidate];
 }
  */
+
+- (NSManagedObjectContext *)context {
+    // Create new context
+    if (!_context) {
+        _context = [[NSManagedObjectContext alloc] init];
+        [_context setPersistentStoreCoordinator:self.store];
+    }
+    
+    return _context;
+}
+
+- (Term *)managedTerm {
+    if (_context != _managedTerm.managedObjectContext) {
+        // NSLog(@"Not in the context");
+    }
+    
+    return _managedTerm;
+}
 
 - (void)countDictionary: (NSMutableDictionary *)dictionary {
     // NSNumber *oldValue;
@@ -188,8 +135,7 @@
 
 #pragma mark Twitter Methods
 
-- (void)fetchNumberOfTweets:(int)number {
-    
+- (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
     ACAccountStore *store = [[ACAccountStore alloc] init];
     if ([SLComposeViewController
          isAvailableForServiceType:SLServiceTypeTwitter]) {
@@ -240,19 +186,13 @@
                                   id statuses = [timelineData valueForKey:@"statuses"];
                                   if ([statuses isKindOfClass:[NSArray class]]) {
                                       for (NSDictionary *dictionary in statuses) {
-                                          [self addTweet:dictionary];
+                                          [self addTweet:dictionary inContext:context];
                                       }
                                       [self.delegate tweetsDidUpdate];
-                                      if ([self save]) {
+                                      if ([self saveContext:context]) {
                                           [self.delegate tweetsDidSave];
                                       }
                                   }
-                                  
-                                  /*
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      // Do something on the main thread
-                                  });
-                                   */
                                    
                               }
                               else {
@@ -274,19 +214,12 @@
              }
          }];
     }
-    
-    [self save];
 }
 
-- (void)setName:(NSString *)name {
-    _name = name;
-    _managedTerm.name = name;
-}
-
-- (void)addTweet: (NSDictionary *)rawTweet {
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:_context];
+- (void)addTweet: (NSDictionary *)rawTweet inContext: (NSManagedObjectContext *)context {
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
     
-    Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:_context];
+    Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     tweet.user = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
     tweet.text = [rawTweet valueForKey:@"text"];
     tweet.term = self.managedTerm;
@@ -367,7 +300,7 @@
         word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:self.context];
         word.name = name;
         word.frequency = @0;
-        word.term = self.managedTerm;
+        word.term = (Term *)[self getManagedObject:self.managedTerm inContext:self.context];
         
         word.parentWord = parentWord;
         [parentWord addFrequencyObjectObject:word];
@@ -379,10 +312,10 @@
     return word;
 }
 
-- (BOOL)save {
+- (BOOL)saveContext: (NSManagedObjectContext *)context {
     // Save the context.
     NSError *error = nil;
-    if (![_context save:&error]) {
+    if (![context save:&error]) {
         // Replace this implementation with code to handle the error appropriately.
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -390,6 +323,30 @@
         abort();
     }
     return YES;
+}
+
+- (NSManagedObject *)getManagedObject: (NSManagedObject*)object inContext: (NSManagedObjectContext *)context {
+    if (object.managedObjectContext == context) {
+        return object;
+    } else if (object){
+        NSManagedObject *newObject;
+        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+        request.entity = object.entity;
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectID == %@", object.objectID];
+        request.predicate = predicate;
+        
+        NSError *error;
+        NSArray *results = [self.context executeFetchRequest:request error:&error];
+        if (!error && results && results.count == 1 && [[results firstObject] isKindOfClass:[Term class]]) {
+            newObject = [results firstObject];
+        } else{
+            if (error) {
+                NSLog(@"%@", error);
+            }
+        }
+        return newObject;
+    } return nil;
 }
 
 @end

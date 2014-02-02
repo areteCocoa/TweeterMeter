@@ -35,6 +35,4 @@
 
 - (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context;
 
-- (void)fetchNumberOfTweets:(int)number;
-
 @end
