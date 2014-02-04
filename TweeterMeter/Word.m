@@ -50,9 +50,14 @@
         word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
         word.name = name;
         
+        word.isValid = @1;
+        word.isHashtag = @0;
+        word.isUser = @0;
+        word.isWord = @0;
+        
         char firstChar = [name characterAtIndex:0];
         if ( firstChar == '\\' ) {
-            word.isValid = NO;
+            word.isValid = @0;
         } else if (firstChar == '#') {
             word.isHashtag = @1;
         } else if (firstChar == '@') {

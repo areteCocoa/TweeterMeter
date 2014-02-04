@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "Term.h"
 #import "FrequencyWord.h"
+#import "FrequencyTag.h"
+#import "FrequencyUser.h"
 #import "Word.h"
 
 @protocol TMTermDelegate <NSObject>

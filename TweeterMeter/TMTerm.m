@@ -13,7 +13,7 @@
 
 @interface TMTerm()
 
-@property (strong, nonatomic, readonly) Term *managedTerm;
+@property (strong, nonatomic) Term *managedTerm;
 @property (strong, nonatomic, readonly) NSManagedObjectContext *context;
 
 @property (strong, nonatomic) NSEntityDescription *entity;
@@ -31,6 +31,7 @@
 - (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context {
     self.entity = managedTerm.entity;
     self.store = context.persistentStoreCoordinator;
+    self.managedTerm = managedTerm;
     
     self.name = managedTerm.name;
     
@@ -41,45 +42,28 @@
     self.popularTags =  [NSMutableDictionary dictionary];
     self.popularUsers = [NSMutableDictionary dictionary];
     
-    NSNumber *oldValue;
-    
     self.frequencyWords = [NSMutableDictionary dictionary];
     for (FrequencyWord* word in managedTerm.frequencyWords) {
         [self.frequencyWords setObject:word forKey:word.name];
         
-        oldValue = [self.popularWords objectForKey:word.name];
-        if (!oldValue) {
-            [self.popularWords setObject:@1 forKey:word.name];
-        } else {
-            [self.popularWords setObject:@([oldValue intValue] + 1) forKey:word.name];
-        }
+        [self countString:word.name];
     }
     
     self.frequencyTags = [NSMutableDictionary dictionary];
-    for (FrequencyWord* tag in managedTerm.frequencyTags) {
+    for (FrequencyTag* tag in managedTerm.frequencyTags) {
         [self.frequencyTags setObject:tag forKey:tag.name];
         
-        oldValue = [self.popularWords objectForKey:tag.name];
-        if (!oldValue) {
-            [self.popularWords setObject:@1 forKey:tag.name];
-        } else {
-            [self.popularWords setObject:@([oldValue intValue] + 1) forKey:tag.name];
-        }
+        [self countString:tag.name];
     }
     
     self.frequencyUsers = [NSMutableDictionary dictionary];
-    for (FrequencyWord* user in managedTerm.frequencyUsers) {
+    for (FrequencyUser* user in managedTerm.frequencyUsers) {
         [self.frequencyUsers setObject:user forKey:user.name];
         
-        oldValue = [self.popularWords objectForKey:user.name];
-        if (!oldValue) {
-            [self.popularWords setObject:@1 forKey:user.name];
-        } else {
-            [self.popularWords setObject:@([oldValue intValue] + 1) forKey:user.name];
-        }
+        [self countString:user.name];
     }
     
-    // NSLog(@"Tweets loaded: %lu", (unsigned long)term.tweets.count);
+    NSLog(@"Tweets loaded: %lu", (unsigned long)self.managedTerm.tweets.count);
     
     // [self startAutoFetchingTweets];
     NSManagedObjectContext *newContext = [[NSManagedObjectContext alloc] init];
@@ -119,17 +103,26 @@
 }
 
 - (Term *)managedTerm {
-    if (_context != _managedTerm.managedObjectContext) {
-        // NSLog(@"Not in the context");
-    }
-    
     return _managedTerm;
 }
 
-- (void)countDictionary: (NSMutableDictionary *)dictionary {
-    // NSNumber *oldValue;
-    for (FrequencyWord *word in dictionary) {
-        //
+- (void)countString: (NSString *)word {
+    NSLog(@"%@", word);
+    char firstCharacter = [word characterAtIndex:0];
+    NSMutableDictionary *dictionary;
+    if (firstCharacter == '#') {
+        dictionary = self.popularTags;
+    } else if (firstCharacter == '@') {
+        dictionary = self.popularUsers;
+    } else {
+        dictionary = self.popularWords;
+    }
+    
+    NSNumber *oldValue = [dictionary objectForKey:word];
+    if (!oldValue) {
+        [dictionary setObject:@1 forKey:word];
+    } else {
+        [dictionary setObject:@([oldValue intValue] + 1) forKey:word];
     }
 }
 
@@ -222,7 +215,7 @@
     Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     tweet.user = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
     tweet.text = [rawTweet valueForKey:@"text"];
-    tweet.term = self.managedTerm;
+    tweet.term = [self getTerm:self.managedTerm inManagedObjectContext:context];
     
     // Analyze Tweet
     [self analyzeTweet:tweet];
@@ -249,34 +242,11 @@
             frequencyWord = [self getFrequencyWordWithName:wordString];
             frequencyWord.frequency = @([frequencyWord.frequency floatValue] + 1);
             
-            /*
-            if ([wordString characterAtIndex:0] == '#') {
-                old = [self.popularTags objectForKey:wordString];
-                if (old) {
-                    [self.popularTags setObject:@([old intValue]+1) forKey:wordString];
-                } else {
-                    [self.popularTags setObject:@1 forKey:wordString];
-                }
-            } else if ([wordString characterAtIndex:0] == '@') {
-                old = [self.popularUsers objectForKey:wordString];
-                if (old) {
-                    [self.popularUsers setObject:@([old intValue]+1) forKey:wordString];
-                } else {
-                    [self.popularUsers setObject:@1 forKey:wordString];
-                }
-            } else {
-                old = [self.popularWords objectForKey:wordString];
-                if (old) {
-                    [self.popularWords setObject:@([old intValue]+1) forKey:wordString];
-                } else {
-                    [self.popularWords setObject:@1 forKey:wordString];
-                }
-            }
-             */
+            [self countString:frequencyWord.name];
         }
     }
     
-    // NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
+    NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
 }
 
 - (FrequencyWord *)getFrequencyWordWithName: (NSString *)name {
@@ -300,11 +270,13 @@
         word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:self.context];
         word.name = name;
         word.frequency = @0;
-        word.term = (Term *)[self getManagedObject:self.managedTerm inContext:self.context];
+        Term *term = [self getTerm:self.managedTerm inManagedObjectContext:self.context];
+        word.term = term;
         
         word.parentWord = parentWord;
         [parentWord addFrequencyObjectObject:word];
         
+        [self saveContext:self.context];
     } else if (set.count > 1) {
         NSLog(@"Objects retreived is greater than expected: %lu objects", (unsigned long)set.count);
     }
@@ -321,32 +293,32 @@
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         return NO;
         abort();
+    } else if (!context) {
+        NSLog(@"context nil");
     }
     return YES;
 }
 
-- (NSManagedObject *)getManagedObject: (NSManagedObject*)object inContext: (NSManagedObjectContext *)context {
-    if (object.managedObjectContext == context) {
-        return object;
-    } else if (object){
-        NSManagedObject *newObject;
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        request.entity = object.entity;
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"objectID == %@", object.objectID];
-        request.predicate = predicate;
-        
-        NSError *error;
-        NSArray *results = [self.context executeFetchRequest:request error:&error];
-        if (!error && results && results.count == 1 && [[results firstObject] isKindOfClass:[Term class]]) {
-            newObject = [results firstObject];
-        } else{
-            if (error) {
-                NSLog(@"%@", error);
-            }
+- (Term *)getTerm: (Term *)term inManagedObjectContext: (NSManagedObjectContext *)context {
+    NSString *name = term.name;
+    NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", name];
+    [fetch setPredicate:predicate];
+    [fetch setEntity:term.entity];
+    
+    NSError *error;
+    
+    Term *newTerm;
+    NSArray *array = [context executeFetchRequest:fetch error:&error];
+    if (!error) {
+        if ([[array firstObject] isKindOfClass:[Term class]]) {
+            newTerm = [array firstObject];
         }
-        return newObject;
-    } return nil;
+    } else {
+        NSLog(@"Error: %@", error);
+    }
+    
+    return newTerm;
 }
-
+ 
 @end
