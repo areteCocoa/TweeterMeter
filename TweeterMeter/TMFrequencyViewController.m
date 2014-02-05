@@ -38,6 +38,32 @@
     self.usersTextView.text = [self.term.popularUsers description];
 }
 
+- (NSDictionary *)getSortedArrayFromDictionary: (NSDictionary *)dictionary {
+    NSDictionary *containerDictionary;
+    
+    NSMutableArray *unsortedKeys = [[dictionary allKeys] mutableCopy];
+    NSArray *sortedValues = [[dictionary allValues] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        if ([obj1 integerValue] > [obj2 integerValue]) {
+            return (NSComparisonResult)NSOrderedDescending;
+        }
+        
+        if ([obj1 integerValue] < [obj2 integerValue]) {
+            return (NSComparisonResult)NSOrderedAscending;
+        }
+        return (NSComparisonResult)NSOrderedSame;
+    }];
+    NSMutableArray *matchedKeys = [NSMutableArray array];
+    for (int count = 0; count < sortedValues.count; count ++) {
+        NSSet *set = [dictionary keysOfEntriesPassingTest:(^)(id key, id obj, BOOL *stop) {
+            
+        }];
+        
+        
+    }
+    
+    return containerDictionary;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];

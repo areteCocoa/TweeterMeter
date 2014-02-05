@@ -81,7 +81,7 @@
     
     NSLog(@"Tweets loaded: %lu", (unsigned long)self.managedTerm.tweets.count);
     
-    [self fetchNumberOfTweets:1 withContext:self.context];
+    [self fetchNumberOfTweets:10 withContext:self.context];
     
     return self;
 }
@@ -233,15 +233,15 @@
     
     // NSNumber *old;
     NSString *wordString;
-    FrequencyWord *frequencyWord;
+    FrequencyObject *frequencyObject;
     
     for (NSUInteger index = 0; index < words.count; index++) {
         wordString = words[index];
         if (wordString.length != 0) {
-            frequencyWord = [self getFrequencyWordWithName:wordString];
-            frequencyWord.frequency = @([frequencyWord.frequency floatValue] + 1);
+            frequencyObject = [self getFrequencyObjectWithName:wordString];
+            frequencyObject.frequency = @([frequencyObject.frequency floatValue] + 1);
             
-            [self countString:frequencyWord.name];
+            [self countString:frequencyObject.name];
         }
     }
     
@@ -249,51 +249,91 @@
 }
 
 - (FrequencyObject *)getFrequencyObjectWithName: (NSString *)name {
+    FrequencyObject *object;
+    
     if ([name characterAtIndex:0] == '#') {
         FrequencyTag *tag;
+        object = [self getFrequencyObjectFromSet:self.managedTerm.frequencyTags withName:name];
+        if ([object isKindOfClass:[FrequencyTag class]]) {
+            tag = (FrequencyTag *)object;
+        }
+        
+        if (!tag) {
+            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            
+            tag = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyTag" inManagedObjectContext:self.context];
+            tag.name = name;
+            tag.frequency = @0;
+            Term *term = self.managedTerm;
+            tag.term = term;
+            [term addFrequencyTagsObject:tag];
+            
+            tag.parentWord = parentWord;
+            [parentWord addFrequencyObjectObject:tag];
+            
+            [self saveContext:self.context];
+        }
+        
         return tag;
     } else if ([name characterAtIndex:0] == '@') {
         FrequencyUser *user;
+        object = [self getFrequencyObjectFromSet:self.managedTerm.frequencyUsers withName:name];
+        if ([object isKindOfClass:[FrequencyUser class]]) {
+            user = (FrequencyUser *)object;
+        }
+        
+        if (!user) {
+            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            
+            user = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyUser" inManagedObjectContext:self.context];
+            user.name = name;
+            user.frequency = @0;
+            Term *term = self.managedTerm;
+            user.term = term;
+            [term addFrequencyUsersObject:user];
+            
+            user.parentWord = parentWord;
+            [parentWord addFrequencyObjectObject:user];
+            
+            [self saveContext:self.context];
+        }
+        
         return user;
     } else {
         FrequencyWord *word;
+        object = [self getFrequencyObjectFromSet:self.managedTerm.frequencyUsers withName:name];
+        if ([object isKindOfClass:[FrequencyWord class]]) {
+            word = (FrequencyWord *)object;
+        }
+        
+        if (!word) {
+            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            
+            word = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyWord" inManagedObjectContext:self.context];
+            word.name = name;
+            word.frequency = @0;
+            Term *term = self.managedTerm;
+            word.term = term;
+            [term addFrequencyWordsObject:word];
+            
+            word.parentWord = parentWord;
+            [parentWord addFrequencyObjectObject:word];
+            
+            [self saveContext:self.context];
+        }
+        
         return word;
     }
 }
 
-- (FrequencyWord *)getFrequencyWordWithName: (NSString *)name {
-    FrequencyWord *word;
-    
-    // Access it without going to the database
-    NSSet *set = [self.managedTerm.frequencyWords objectsPassingTest:^BOOL(id obj, BOOL *stop) {
-        FrequencyWord *termWord = (FrequencyWord *)obj;
-        
-        return (termWord.name == name);
+- (FrequencyObject *)getFrequencyObjectFromSet: (NSSet *)set withName: (NSString *)name {
+    NSSet *objects = [set objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+        FrequencyObject *nextObject = (FrequencyObject *)obj;
+        return (nextObject.name == name);
     }];
-    word = [set anyObject];
-    if (word) {
-        return word;
-    } else if (set.count <= 0) {
-        // Create new FrequencyWord
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"FrequencyWord" inManagedObjectContext:self.context];
-        
-        Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
-        
-        word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:self.context];
-        word.name = name;
-        word.frequency = @0;
-        Term *term = self.managedTerm;
-        word.term = term;
-        
-        word.parentWord = parentWord;
-        [parentWord addFrequencyObjectObject:word];
-        
-        [self saveContext:self.context];
-    } else if (set.count > 1) {
-        NSLog(@"Objects retreived is greater than expected: %lu objects", (unsigned long)set.count);
-    }
     
-    return word;
+    FrequencyObject *object = [objects anyObject];
+    return object;
 }
 
 - (BOOL)saveContext: (NSManagedObjectContext *)context {
