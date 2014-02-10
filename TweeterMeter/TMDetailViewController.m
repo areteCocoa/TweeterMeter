@@ -106,7 +106,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass data to the VCs
         [self updateSubviews];
-        NSLog(@"tweets saved!");
     });
 }
 

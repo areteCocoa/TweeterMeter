@@ -11,7 +11,7 @@
 
 @class FrequencyObject;
 
-@interface Word : NSManagedObject
+@interface Word : NSManagedObject <NSXMLParserDelegate>
 
 @property (nonatomic, retain) NSNumber * isHashtag;
 @property (nonatomic, retain) NSNumber * isUser;
@@ -21,7 +21,8 @@
 @property (nonatomic, retain) NSString * type;
 @property (nonatomic, retain) NSSet * frequencyObject;
 
-+ (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context;
+- (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context;
++ (void)loadInvalidStrings;
 
 @end
 

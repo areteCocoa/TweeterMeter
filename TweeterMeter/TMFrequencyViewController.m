@@ -78,7 +78,7 @@
     }];
     NSMutableArray *matchedKeys = [NSMutableArray array];
     for (int enumerator = 0; enumerator <= [[sortedValues firstObject] intValue]; enumerator ++) {
-        NSSet *set = [dictionary keysOfEntriesPassingTest:^(id key, id obj, BOOL *stop) {
+        NSSet *set = [[dictionary copy] keysOfEntriesPassingTest:^(id key, id obj, BOOL *stop) {
             if ([obj intValue] == enumerator) {
                 return YES;
             }

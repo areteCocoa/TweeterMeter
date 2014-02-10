@@ -9,10 +9,55 @@
 #import "Word.h"
 #import "FrequencyObject.h"
 
+@interface TMInvalidStringLoader : NSObject <NSXMLParserDelegate>
+
+@property (nonatomic, retain) NSString *fileName;
+@property (nonatomic, retain, readonly) NSXMLParser *parser;
+@property (nonatomic, retain) NSSet *data;
+@property (nonatomic, retain) NSMutableSet *loadingData;
+@property (nonatomic, retain) NSMutableDictionary *currentDictionary;
+@property (nonatomic) BOOL isLoadingData;
+
+- (id)initWithFileName: (NSString *)name;
+
+@end
+
+@implementation TMInvalidStringLoader
+
+@synthesize parser = _parser;
+
+- (id)initWithFileName:(NSString *)name {
+    self = [super init];
+    self.fileName = name;
+    self.isLoadingData = YES;
+    self.loadingData = [NSMutableSet set];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"filter_strings" withExtension:@"xml"];
+    _parser = [[NSXMLParser alloc] initWithContentsOfURL:url];
+    self.parser.delegate = self;
+    if(![self.parser parse]) {
+        NSLog(@"%@", [self.parser parserError]);
+    }
+    self.isLoadingData = NO;
+    return self;
+}
+
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
+    if ([elementName isEqualToString:@"string"]) {
+        [self.loadingData addObject:[attributeDict valueForKey:@"text"]];
+    }
+}
+
+- (void)parserDidEndDocument:(NSXMLParser *)parser {
+    self.data = [NSSet setWithSet:self.loadingData];
+    self.isLoadingData = NO;
+}
+
+@end
+
 
 @interface Word()
 
-+ (NSSet *)invalidStrings;
+- (NSSet *)invalidStrings;
 - (BOOL)stringIsValid;
 
 @end
@@ -27,9 +72,7 @@
 @dynamic type;
 @dynamic frequencyObject;
 
-+ (Word *)fetchWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context{
-    Word *word;
-    
+- (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context {
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Word" inManagedObjectContext:context];
     NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
     [fetch setEntity:entity];
@@ -50,48 +93,52 @@
         NSLog(@"Error");
     }
     
-    word = [objects firstObject];
+    self = [objects firstObject];
     
     // Create new word
-    if (!word) {
-        word = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        word.name = name;
+    if (!self) {
+        self = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+        self.name = name;
         
-        word.isValid = @1;
-        word.isHashtag = @0;
-        word.isUser = @0;
-        word.isWord = @0;
+        self.isValid = @1;
+        self.isHashtag = @0;
+        self.isUser = @0;
+        self.isWord = @0;
         
-        // NSSet *invalids = [self invalidCharacters];
+        for (NSString *invalid in [self invalidStrings]) {
+            if ([self.name rangeOfString:invalid].location != NSNotFound) {
+                self.isValid = @0;
+            }
+        }
         
         char firstChar = [name characterAtIndex:0];
-        if ( firstChar == '\\' ) {
-            word.isValid = @0;
-        } else if (firstChar == '#') {
-            word.isHashtag = @1;
+        if (firstChar == '#') {
+            self.isHashtag = @1;
         } else if (firstChar == '@') {
-            word.isUser = @1;
+            self.isUser = @1;
         } else {
-            word.isWord = @1;
+            self.isWord = @1;
         }
-        // find type of word
-        
     }
     
-    if ([name characterAtIndex:0] == '@') {
-        word.isUser = @1;
-    } else if ([name characterAtIndex:0] == '#') {
-        word.isHashtag = @1;
-    }
-    
-    return word;
+    return self;
 }
 
-+ (NSSet *)invalidStrings {
+- (void)awakeFromInsert {
+    [super awakeFromInsert];
+    
+    // Retreive definition from API
+}
+
+- (NSSet *)invalidStrings {
     static NSSet *invalidStrings = nil;
     
     if (!invalidStrings) {
         invalidStrings = [NSSet set];
+        
+        TMInvalidStringLoader *stringLoader = [[TMInvalidStringLoader alloc] initWithFileName:@"filter_words.xml"];
+        while (stringLoader.isLoadingData);
+        invalidStrings = stringLoader.data;
     }
     
     return invalidStrings;
@@ -101,10 +148,14 @@
     return YES;
 }
 
-- (void)awakeFromInsert {
-    [super awakeFromInsert];
++ (void)loadInvalidStrings {
     
-    // Retreive definition from API
+}
+
+#pragma mark - NSXMLParserDelegate methods
+
+- (void)parserDidStartDocument:(NSXMLParser *)parser {
+    NSLog(@"Document started!");
 }
 
 @end

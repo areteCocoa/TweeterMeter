@@ -19,6 +19,7 @@
 		54D2B8531890529C00F42BD4 /* FrequencyTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B8521890529C00F42BD4 /* FrequencyTag.m */; };
 		54D2B8561890529C00F42BD4 /* FrequencyWord.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B8551890529C00F42BD4 /* FrequencyWord.m */; };
 		54D2B85C189053F800F42BD4 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B85B189053F800F42BD4 /* Word.m */; };
+		54D34EE418A889DD0004556D /* filter_strings.xml in Resources */ = {isa = PBXBuildFile; fileRef = 54D34EE318A889DD0004556D /* filter_strings.xml */; };
 		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
 		54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB518667C7B00EA5100 /* Foundation.framework */; };
 		54E0AFB818667C7B00EA5100 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB718667C7B00EA5100 /* CoreGraphics.framework */; };
@@ -75,6 +76,7 @@
 		54D2B8551890529C00F42BD4 /* FrequencyWord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyWord.m; sourceTree = "<group>"; };
 		54D2B85A189053F800F42BD4 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Word.h; sourceTree = "<group>"; };
 		54D2B85B189053F800F42BD4 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Word.m; sourceTree = "<group>"; };
+		54D34EE318A889DD0004556D /* filter_strings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = filter_strings.xml; sourceTree = "<group>"; };
 		54D9C393186B64290078456B /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		54D9C394186B64290078456B /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		54E0AFB218667C7B00EA5100 /* TweeterMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TweeterMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -221,6 +223,7 @@
 		54E0AFBE18667C7B00EA5100 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				54D34EE318A889DD0004556D /* filter_strings.xml */,
 				54E0AFBF18667C7B00EA5100 /* TweeterMeter-Info.plist */,
 				54E0AFC018667C7B00EA5100 /* InfoPlist.strings */,
 				54E0AFC318667C7B00EA5100 /* main.m */,
@@ -336,6 +339,7 @@
 				54E0AFD618667C7B00EA5100 /* Images.xcassets in Resources */,
 				54E0AFC218667C7B00EA5100 /* InfoPlist.strings in Resources */,
 				54E0AFCB18667C7B00EA5100 /* Main.storyboard in Resources */,
+				54D34EE418A889DD0004556D /* filter_strings.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

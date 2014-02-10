@@ -88,7 +88,8 @@
     
     NSLog(@"Tweets loaded: %lu", (unsigned long)self.managedTerm.tweets.count);
     
-    [self fetchNumberOfTweets:50 withContext:self.context];
+    [self fetchNumberOfTweets:100 withContext:self.context];
+    [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(fetchMaxTweets) userInfo:nil repeats:YES];
     
     return self;
 }
@@ -114,8 +115,11 @@
 
 #pragma mark Twitter Methods
 
+- (void)fetchMaxTweets {
+    [self fetchNumberOfTweets:200 withContext:self.context];
+}
+
 - (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
-    NSLog(@"Fetching %@ tweets...", [NSNumber numberWithInt:number]);
     ACAccountStore *store = [[ACAccountStore alloc] init];
     if ([SLComposeViewController
          isAvailableForServiceType:SLServiceTypeTwitter]) {
@@ -172,7 +176,7 @@
                                       if ([self saveContext:context]) {
                                           [self.delegate tweetsDidSave];
                                       }
-                                       NSLog(@"Done fetching %@ tweets.", [NSNumber numberWithInt:number]);
+                                      NSLog(@"Attempted to fetch %@ tweets. %@ received.", [NSNumber numberWithInt:number], [NSNumber numberWithFloat:[statuses allObjects].count]);
                                   }
                               }
                               else {
@@ -248,7 +252,9 @@
             frequencyObject = [self getFrequencyObjectWithName:wordString];
             [frequencyObject addOneToFrequency];
             
-            [self countString:frequencyObject.name];
+            if (self.displayInvalidWords || [frequencyObject.parentWord.isValid isEqualToNumber:@1]) {
+                [self countString:frequencyObject.name];
+            }
         }
     }
     
@@ -267,7 +273,7 @@
         }
         
         if (!tag) {
-            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            Word *parentWord = [[Word alloc] initWordWithName:name inContext:self.context];
             
             tag = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyTag" inManagedObjectContext:self.context];
             tag.name = name;
@@ -289,7 +295,7 @@
         }
         
         if (!user) {
-            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            Word *parentWord = [[Word alloc] initWordWithName:name inContext:self.context];
             
             user = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyUser" inManagedObjectContext:self.context];
             user.name = name;
@@ -311,7 +317,7 @@
         }
         
         if (!word) {
-            Word *parentWord = [Word fetchWordWithName:name inContext:self.context];
+            Word *parentWord = [[Word alloc] initWordWithName:name inContext:self.context];
             
             word = [NSEntityDescription insertNewObjectForEntityForName:@"FrequencyWord" inManagedObjectContext:self.context];
             word.name = name;
