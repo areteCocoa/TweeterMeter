@@ -13,6 +13,7 @@
 @interface Word()
 
 + (NSSet *)invalidStrings;
+- (BOOL)stringIsValid;
 
 @end
 
@@ -61,7 +62,7 @@
         word.isUser = @0;
         word.isWord = @0;
         
-        NSSet *invalids = [self invalidWords];
+        // NSSet *invalids = [self invalidCharacters];
         
         char firstChar = [name characterAtIndex:0];
         if ( firstChar == '\\' ) {
@@ -86,14 +87,18 @@
     return word;
 }
 
-+ (NSSet *)invalidCharacters {
-    static NSSet *invalidWords = nil;
++ (NSSet *)invalidStrings {
+    static NSSet *invalidStrings = nil;
     
     if (!invalidStrings) {
-        invalidWords = [NSSet setWithObjects:<#(id), ...#>, nil];
+        invalidStrings = [NSSet set];
     }
     
-    return invalidWords;
+    return invalidStrings;
+}
+
+- (BOOL)stringIsValid {
+    return YES;
 }
 
 - (void)awakeFromInsert {
