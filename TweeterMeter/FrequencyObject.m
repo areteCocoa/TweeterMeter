@@ -26,4 +26,10 @@
     }
 }
 
+- (void)addOneToFrequency {
+    float oldFrequency = [self.frequency floatValue];
+    float newFrequency = oldFrequency + 1;
+    self.frequency = [NSNumber numberWithFloat:newFrequency];
+}
+
 @end

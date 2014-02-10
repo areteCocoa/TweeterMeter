@@ -27,7 +27,7 @@
 
 - (id)initWithTerm: (TMTerm *)term {
     self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"chart"];
-    self.term = term;
+    _term = term;
     
     return self;
 }
@@ -47,7 +47,7 @@
     [self.pieChart setPieBackgroundColor:[UIColor clearColor]];
     [self.pieChart reloadData];
     
-    [self.tweetTextView setText:[[self.term tweets] description]];
+    [self.tweetTextView setText:[self.term description]];
 }
 
 - (void)updateView {

@@ -28,14 +28,12 @@
 
 @synthesize context = _context, managedTerm = _managedTerm;
 
-- (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context {
+- (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context {    
     self.entity = managedTerm.entity;
     self.store = context.persistentStoreCoordinator;
     
     self.name = managedTerm.name;
-    
-    self.tweets = [NSMutableSet set];
-    self.tweets = [managedTerm.tweets mutableCopy];
+    self.displayInvalidWords = NO;
     
     self.popularWords = [NSMutableDictionary dictionary];
     self.popularTags =  [NSMutableDictionary dictionary];
@@ -58,36 +56,44 @@
         NSLog(@"Error: %@", error);
     }
     
-    self.frequencyWords = [NSMutableDictionary dictionary];
     for (FrequencyWord* word in managedTerm.frequencyWords) {
-        [self.frequencyWords setObject:word forKey:word.name];
-        
-        [self.popularWords setObject:word.frequency forKey:word.name];
+        if (!self.displayInvalidWords) {
+            if (![word.parentWord.isValid isEqualToNumber:@0]) {
+                [self.popularWords setObject:word.frequency forKey:word.name];
+            }
+        } else {
+            [self.popularWords setObject:word.frequency forKey:word.name];
+        }
     }
     
-    self.frequencyTags = [NSMutableDictionary dictionary];
     for (FrequencyTag* tag in managedTerm.frequencyTags) {
-        [self.frequencyTags setObject:tag forKey:tag.name];
-        
-        [self.popularTags setObject:tag.frequency forKey:tag.name];
+        if (!self.displayInvalidWords) {
+            if (![tag.parentWord.isValid isEqualToNumber:@0]) {
+                [self.popularTags setObject:tag.frequency forKey:tag.name];
+            }
+        } else {
+            [self.popularTags setObject:tag.frequency forKey:tag.name];
+        }
     }
     
-    self.frequencyUsers = [NSMutableDictionary dictionary];
     for (FrequencyUser* user in managedTerm.frequencyUsers) {
-        [self.frequencyUsers setObject:user forKey:user.name];
-        
-        [self.popularUsers setObject:user.frequency forKey:user.name];
+        if (!self.displayInvalidWords) {
+            if (![user.parentWord.isValid isEqualToNumber:@0]) {
+                [self.popularUsers setObject:user.frequency forKey:user.name];
+            }
+        } else {
+            [self.popularUsers setObject:user.frequency forKey:user.name];
+        }
     }
     
     NSLog(@"Tweets loaded: %lu", (unsigned long)self.managedTerm.tweets.count);
     
-    [self fetchNumberOfTweets:10 withContext:self.context];
+    [self fetchNumberOfTweets:50 withContext:self.context];
     
     return self;
 }
 
 - (void)countString: (NSString *)word {
-    NSLog(@"%@", word);
     char firstCharacter = [word characterAtIndex:0];
     NSMutableDictionary *dictionary;
     if (firstCharacter == '#') {
@@ -109,6 +115,7 @@
 #pragma mark Twitter Methods
 
 - (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
+    NSLog(@"Fetching %@ tweets...", [NSNumber numberWithInt:number]);
     ACAccountStore *store = [[ACAccountStore alloc] init];
     if ([SLComposeViewController
          isAvailableForServiceType:SLServiceTypeTwitter]) {
@@ -165,8 +172,8 @@
                                       if ([self saveContext:context]) {
                                           [self.delegate tweetsDidSave];
                                       }
+                                       NSLog(@"Done fetching %@ tweets.", [NSNumber numberWithInt:number]);
                                   }
-                                   
                               }
                               else {
                                   // Our JSON deserialization went awry
@@ -205,21 +212,21 @@
     } else if ([array firstObject]) {
         id object = [array firstObject];
         if ([object isKindOfClass:[Tweet class]]) {
-            NSLog(@"Object already exists! %@", [array firstObject]);
             tweet = object;
         }
     } else {
         tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
         tweet.user = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
         tweet.text = [rawTweet valueForKey:@"text"];
-        tweet.term = self.managedTerm;
     }
     
     // Analyze Tweet
-    [self analyzeTweet:tweet];
+    if (![self.managedTerm.tweets containsObject:tweet]) {
+        [self analyzeTweet:tweet];
+        tweet.term = self.managedTerm;
+    }
     
-    [self.tweets addObject:tweet];
-    [self.managedTerm addTweetsObject:tweet];
+    // [self.delegate tweetsDidUpdate];
 }
 
 // Goes through tweet looking for certain words
@@ -236,16 +243,17 @@
     FrequencyObject *frequencyObject;
     
     for (NSUInteger index = 0; index < words.count; index++) {
-        wordString = words[index];
+        wordString = [words[index] lowercaseString];
         if (wordString.length != 0) {
             frequencyObject = [self getFrequencyObjectWithName:wordString];
-            frequencyObject.frequency = @([frequencyObject.frequency floatValue] + 1);
+            [frequencyObject addOneToFrequency];
             
             [self countString:frequencyObject.name];
         }
     }
     
-    NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
+    // Log resulting frequency sets
+    // NSLog(@"Words: %@, Users: %@, Hashtags: %@", self.popularWords, self.popularUsers, self.popularTags);
 }
 
 - (FrequencyObject *)getFrequencyObjectWithName: (NSString *)name {
@@ -266,10 +274,8 @@
             tag.frequency = @0;
             Term *term = self.managedTerm;
             tag.term = term;
-            [term addFrequencyTagsObject:tag];
             
             tag.parentWord = parentWord;
-            [parentWord addFrequencyObjectObject:tag];
             
             [self saveContext:self.context];
         }
@@ -290,10 +296,8 @@
             user.frequency = @0;
             Term *term = self.managedTerm;
             user.term = term;
-            [term addFrequencyUsersObject:user];
             
             user.parentWord = parentWord;
-            [parentWord addFrequencyObjectObject:user];
             
             [self saveContext:self.context];
         }
@@ -301,7 +305,7 @@
         return user;
     } else {
         FrequencyWord *word;
-        object = [self getFrequencyObjectFromSet:self.managedTerm.frequencyUsers withName:name];
+        object = [self getFrequencyObjectFromSet:self.managedTerm.frequencyWords withName:name];
         if ([object isKindOfClass:[FrequencyWord class]]) {
             word = (FrequencyWord *)object;
         }
@@ -314,10 +318,7 @@
             word.frequency = @0;
             Term *term = self.managedTerm;
             word.term = term;
-            [term addFrequencyWordsObject:word];
-            
             word.parentWord = parentWord;
-            [parentWord addFrequencyObjectObject:word];
             
             [self saveContext:self.context];
         }
@@ -329,7 +330,7 @@
 - (FrequencyObject *)getFrequencyObjectFromSet: (NSSet *)set withName: (NSString *)name {
     NSSet *objects = [set objectsPassingTest:^BOOL(id obj, BOOL *stop) {
         FrequencyObject *nextObject = (FrequencyObject *)obj;
-        return (nextObject.name == name);
+        return ([nextObject.name isEqualToString:name]);
     }];
     
     FrequencyObject *object = [objects anyObject];

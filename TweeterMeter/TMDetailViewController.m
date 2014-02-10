@@ -72,7 +72,7 @@
 	// Do any additional setup after loading the view, typically from a nib.
     // Update modal with newer tweets
     
-    [self.splitViewController.view setNeedsLayout];
+    //[self.splitViewController.view setNeedsLayout];
     [self configureView];
     
     self.pageViewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);

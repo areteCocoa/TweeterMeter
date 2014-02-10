@@ -23,11 +23,8 @@
 @interface TMTerm : NSObject
 
 @property (strong, nonatomic) NSString *name;
-@property (strong, nonatomic) NSMutableSet *tweets;	
 
-@property (strong, nonatomic) NSMutableDictionary *frequencyWords;
-@property (strong, nonatomic) NSMutableDictionary *frequencyTags;
-@property (strong, nonatomic) NSMutableDictionary *frequencyUsers;
+@property (nonatomic) BOOL displayInvalidWords;
 
 @property (strong, nonatomic) NSMutableDictionary *popularWords;
 @property (strong, nonatomic) NSMutableDictionary *popularTags;

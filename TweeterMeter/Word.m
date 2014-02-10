@@ -10,6 +10,12 @@
 #import "FrequencyObject.h"
 
 
+@interface Word()
+
++ (NSSet *)invalidStrings;
+
+@end
+
 @implementation Word
 
 @dynamic isHashtag;
@@ -55,6 +61,8 @@
         word.isUser = @0;
         word.isWord = @0;
         
+        NSSet *invalids = [self invalidWords];
+        
         char firstChar = [name characterAtIndex:0];
         if ( firstChar == '\\' ) {
             word.isValid = @0;
@@ -76,6 +84,16 @@
     }
     
     return word;
+}
+
++ (NSSet *)invalidCharacters {
+    static NSSet *invalidWords = nil;
+    
+    if (!invalidStrings) {
+        invalidWords = [NSSet setWithObjects:<#(id), ...#>, nil];
+    }
+    
+    return invalidWords;
 }
 
 - (void)awakeFromInsert {
