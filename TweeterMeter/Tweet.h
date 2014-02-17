@@ -15,5 +15,7 @@
 @property (nonatomic, retain) NSString * text;
 @property (nonatomic, retain) NSString * user;
 @property (nonatomic, retain) Term * term;
+@property (nonatomic, retain) NSNumber * tweetID;
+@property (nonatomic, retain) NSDate * date;
 
 @end

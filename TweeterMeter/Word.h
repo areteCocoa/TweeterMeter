@@ -8,10 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "TMInvalidStringLoader.h"
+#import "Lexicontext.h"
 
 @class FrequencyObject;
 
-@interface Word : NSManagedObject <NSXMLParserDelegate>
+@interface Word : NSManagedObject
 
 @property (nonatomic, retain) NSNumber * isHashtag;
 @property (nonatomic, retain) NSNumber * isUser;
@@ -22,7 +24,6 @@
 @property (nonatomic, retain) NSSet * frequencyObject;
 
 - (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context;
-+ (void)loadInvalidStrings;
 
 @end
 

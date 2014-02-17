@@ -18,8 +18,13 @@
     <string text=";"></string>
     <string text="'"></string>
     <string text='"'></string>
+    <string text="\"></string>
 </filter>
 <filter name="twitter_reserved_strings">
     <string text="rt"></string>
+</filter>
+<filter name="articles">
+    <string text="a"></string>
+    <string text="the"></string>
 </filter>
 </plist>

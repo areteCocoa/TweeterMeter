@@ -14,5 +14,7 @@
 @dynamic text;
 @dynamic user;
 @dynamic term;
+@dynamic tweetID;
+@dynamic date;
 
 @end

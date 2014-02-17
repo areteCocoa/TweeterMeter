@@ -33,7 +33,10 @@
     self.store = context.persistentStoreCoordinator;
     
     self.name = managedTerm.name;
+    
+    // SETTINGS AND OPTIONS
     self.displayInvalidWords = NO;
+    self.topStackRefresh = 60;
     
     self.popularWords = [NSMutableDictionary dictionary];
     self.popularTags =  [NSMutableDictionary dictionary];
@@ -116,7 +119,7 @@
 #pragma mark Twitter Methods
 
 - (void)fetchMaxTweets {
-    [self fetchNumberOfTweets:200 withContext:self.context];
+    [self fetchNumberOfTweets:100 withContext:self.context];
 }
 
 - (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
@@ -125,27 +128,24 @@
          isAvailableForServiceType:SLServiceTypeTwitter]) {
         
         //  Step 1:  Obtain access to the user's Twitter accounts
-        ACAccountType *twitterAccountType =
-        [store accountTypeWithAccountTypeIdentifier:
-         ACAccountTypeIdentifierTwitter];
+        ACAccountType *twitterAccountType = [store accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierTwitter];
         
-        [store
-         requestAccessToAccountsWithType:twitterAccountType
-         options:NULL
-         completion:^(BOOL granted, NSError *error) {
+        [store requestAccessToAccountsWithType:twitterAccountType options:NULL
+                                    completion:^(BOOL granted, NSError *error) {
              if (granted) {
-                 //  Step 2:  Create a request
-                 NSArray *twitterAccounts =
-                 [store accountsWithAccountType:twitterAccountType];
+                 // Create a request
+                 // See what range of tweets we should be getting
+                 NSMutableDictionary *params = [@{@"q" : _name,
+                                                 @"result_type" : @"recent",
+                                                 @"count" : [NSString stringWithFormat:@"%i", number]} mutableCopy];
+                 if (abs([self.managedTerm.maxDate timeIntervalSinceNow]) > 60*60) {
+                     [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.maxID] forKey:@"since_id"];
+                 }
+                 
+                 
+                 NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
                  NSURL *url = [NSURL URLWithString:@"https://api.twitter.com/1.1/search/tweets.json"];
-                 NSDictionary *params = @{@"q" : _name,
-                                          @"result_type" : @"recent",
-                                          @"count" : [NSString stringWithFormat:@"%i", number]};
-                 SLRequest *request =
-                 [SLRequest requestForServiceType:SLServiceTypeTwitter
-                                    requestMethod:SLRequestMethodGET
-                                              URL:url
-                                       parameters:params];
+                 SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeTwitter requestMethod:SLRequestMethodGET URL:url parameters:params];
                  
                  //  Attach an account to the request
                  [request setAccount:[twitterAccounts lastObject]];
@@ -157,9 +157,7 @@
                     NSError *error) {
                       
                       if (responseData) {
-                          if (urlResponse.statusCode >= 200 &&
-                              urlResponse.statusCode < 300) {
-                              
+                          if (urlResponse.statusCode >= 200 && urlResponse.statusCode < 300) {
                               NSError *jsonError;
                               NSDictionary *timelineData =
                               [NSJSONSerialization
@@ -222,14 +220,42 @@
         tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
         tweet.user = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
         tweet.text = [rawTweet valueForKey:@"text"];
+        tweet.tweetID = [rawTweet valueForKey:@"id"];
+        
+        // Convert twitter date string to NSDate
+        NSString *creationDate = [[rawTweet valueForKey:@"created_at"] substringFromIndex:4];
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"MM dd HH:mm:ss '+0000' yyyy"];
+        NSDate *date = [formatter dateFromString:creationDate];
+        tweet.date = date;
     }
     
     // Analyze Tweet
     if (![self.managedTerm.tweets containsObject:tweet]) {
         [self analyzeTweet:tweet];
-        tweet.term = self.managedTerm;
     }
     
+    if (self.managedTerm.tweets.count == 0) {
+        self.managedTerm.maxDate = tweet.date;
+        self.managedTerm.minDate = tweet.date;
+        self.managedTerm.maxID = tweet.tweetID;
+        self.managedTerm.minID = tweet.tweetID;
+    } else {
+        // Check ID range...
+        if (tweet.tweetID > self.managedTerm.maxID) {
+            self.managedTerm.maxID = tweet.tweetID;
+        } else if (tweet.tweetID < self.managedTerm.minID) {
+            self.managedTerm.minID = tweet.tweetID;
+        }
+        // And date range...
+        if ([tweet.date earlierDate:self.managedTerm.minDate] == tweet.date) {
+            self.managedTerm.minDate = tweet.date;
+        } else if ([tweet.date laterDate:self.managedTerm.maxDate] == tweet.date) {
+            self.managedTerm.maxDate = tweet.date;
+        }
+    }
+    
+    tweet.term = self.managedTerm;
     // [self.delegate tweetsDidUpdate];
 }
 
@@ -351,7 +377,7 @@
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         return NO;
-        abort();
+        // abort();
     } else if (!context) {
         NSLog(@"context nil");
     }

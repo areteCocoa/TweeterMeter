@@ -10,7 +10,7 @@
 
 #import "TMTerm.h"
 
-@interface TMFrequencyViewController : UIViewController
+@interface TMFrequencyViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) TMTerm *term;
 

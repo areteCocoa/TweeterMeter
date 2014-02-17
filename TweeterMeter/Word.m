@@ -9,58 +9,18 @@
 #import "Word.h"
 #import "FrequencyObject.h"
 
-@interface TMInvalidStringLoader : NSObject <NSXMLParserDelegate>
-
-@property (nonatomic, retain) NSString *fileName;
-@property (nonatomic, retain, readonly) NSXMLParser *parser;
-@property (nonatomic, retain) NSSet *data;
-@property (nonatomic, retain) NSMutableSet *loadingData;
-@property (nonatomic, retain) NSMutableDictionary *currentDictionary;
-@property (nonatomic) BOOL isLoadingData;
-
-- (id)initWithFileName: (NSString *)name;
-
-@end
-
-@implementation TMInvalidStringLoader
-
-@synthesize parser = _parser;
-
-- (id)initWithFileName:(NSString *)name {
-    self = [super init];
-    self.fileName = name;
-    self.isLoadingData = YES;
-    self.loadingData = [NSMutableSet set];
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"filter_strings" withExtension:@"xml"];
-    _parser = [[NSXMLParser alloc] initWithContentsOfURL:url];
-    self.parser.delegate = self;
-    if(![self.parser parse]) {
-        NSLog(@"%@", [self.parser parserError]);
-    }
-    self.isLoadingData = NO;
-    return self;
-}
-
-- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict {
-    if ([elementName isEqualToString:@"string"]) {
-        [self.loadingData addObject:[attributeDict valueForKey:@"text"]];
-    }
-}
-
-- (void)parserDidEndDocument:(NSXMLParser *)parser {
-    self.data = [NSSet setWithSet:self.loadingData];
-    self.isLoadingData = NO;
-}
-
-@end
-
-
 @interface Word()
 
+- (id)initWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context withType: (NSString *)type;
+- (void)findType;
 - (NSSet *)invalidStrings;
-- (BOOL)stringIsValid;
+
++ (NSURLSession *)urlSession;
 
 @end
+
+NSString *kBaseURLString = @"https://www.macmillandictionary.com/api/v1/dictionaries/american/search?q=";
+NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7ngumxlwdgk";
 
 @implementation Word
 
@@ -73,6 +33,30 @@
 @dynamic frequencyObject;
 
 - (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context {
+    self = [self initWordWithName:name inContext:context withType:nil];
+    
+    // Find type
+    [self findType];
+    
+    return self;
+}
+- (id)initWordWithName:(NSString *)name inContext:(NSManagedObjectContext *)context withType: (NSString *)type {
+    self = [Word createWordWithName:name inContext:context];
+    self.type = type;
+    
+    return self;
+}
+
++ (id)createWordWithName: (NSString *)name inContext:(NSManagedObjectContext *)context {
+    Word *word = [NSEntityDescription insertNewObjectForEntityForName:@"Word" inManagedObjectContext:context];
+    word.name = name;
+    
+    return word;
+}
+
++ (id)findWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context {
+    Word *word;
+    
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Word" inManagedObjectContext:context];
     NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
     [fetch setEntity:entity];
@@ -93,41 +77,73 @@
         NSLog(@"Error");
     }
     
-    self = [objects firstObject];
-    
-    // Create new word
-    if (!self) {
-        self = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        self.name = name;
-        
-        self.isValid = @1;
-        self.isHashtag = @0;
-        self.isUser = @0;
-        self.isWord = @0;
-        
-        for (NSString *invalid in [self invalidStrings]) {
-            if ([self.name rangeOfString:invalid].location != NSNotFound) {
-                self.isValid = @0;
-            }
-        }
-        
-        char firstChar = [name characterAtIndex:0];
-        if (firstChar == '#') {
-            self.isHashtag = @1;
-        } else if (firstChar == '@') {
-            self.isUser = @1;
-        } else {
-            self.isWord = @1;
-        }
-    }
-    
-    return self;
+    word = [objects firstObject];
+    return word;
 }
+
 
 - (void)awakeFromInsert {
     [super awakeFromInsert];
     
-    // Retreive definition from API
+    self.isValid = @1;
+    self.isHashtag = @0;
+    self.isUser = @0;
+    self.isWord = @0;
+    
+    for (NSString *invalid in [self invalidStrings]) {
+        if ([self.name rangeOfString:invalid].location != NSNotFound) {
+            self.isValid = @0;
+        }
+    }
+    
+    char firstChar = [self.name characterAtIndex:0];
+    if (firstChar == '#') {
+        self.isHashtag = @1;
+    } else if (firstChar == '@') {
+        self.isUser = @1;
+    } else {
+        self.isWord = @1;
+    }
+}
+
+- (void)findType {
+    // Find type from dictionary API
+    self.type = nil;
+    
+    // Using the online API
+    /*
+    NSString *urlString = [NSString stringWithFormat:@"%@%@", kBaseURLString, self.name];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
+    [urlRequest setHTTPMethod:@"GET"];
+    [urlRequest addValue:kAccessKey forHTTPHeaderField:@"accessKey"];
+    
+    // Cache all this
+    NSURLSession *session = [Word urlSession];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:urlRequest completionHandler:
+                                  ^(NSData *data, NSURLResponse *response, NSError *error) {
+                                      if (data) {
+                                          NSError *jsonError;
+                                          NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+                                          NSArray *results = [dictionary objectForKey:@"results"];
+                                          
+                                          int enumerator = 0;
+                                          while (self.type == nil || enumerator < results.count) {
+                                              NSDictionary *object = [results objectAtIndex:enumerator];
+                                              NSString *label = [object objectForKey:@"entryLabel"];
+                                              NSLog(@"%@", [label substringFromIndex:self.name.length]);
+                                          }
+                                      }
+    }];
+    [task resume];
+     */
+    
+    if ([self.name characterAtIndex:0] == 'a' || [self.name characterAtIndex:0] == 'A') {
+        Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
+        NSDictionary *word = [dictionaryContext definitionAsDictionaryFor:self.name];
+        NSArray *types = [word allKeys];
+        NSLog(@"%@", types);
+    }
 }
 
 - (NSSet *)invalidStrings {
@@ -144,18 +160,14 @@
     return invalidStrings;
 }
 
-- (BOOL)stringIsValid {
-    return YES;
-}
-
-+ (void)loadInvalidStrings {
++ (NSURLSession *)urlSession {
+    static NSURLSession *session;
     
-}
-
-#pragma mark - NSXMLParserDelegate methods
-
-- (void)parserDidStartDocument:(NSXMLParser *)parser {
-    NSLog(@"Document started!");
+    if (!session) {
+        session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    }
+    
+    return session;
 }
 
 @end

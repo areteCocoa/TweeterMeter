@@ -30,7 +30,9 @@
         <userInfo/>
     </entity>
     <entity name="Tweet" representedClassName="Tweet" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tweetID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Deny" destinationEntity="Term" inverseName="tweets" inverseEntity="Term" syncable="YES"/>
     </entity>
@@ -49,7 +51,7 @@
         <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="58"/>
         <element name="FrequencyWord" positionX="-90" positionY="266" width="128" height="58"/>
         <element name="Term" positionX="-324" positionY="18" width="128" height="193"/>
-        <element name="Tweet" positionX="-90" positionY="18" width="128" height="90"/>
+        <element name="Tweet" positionX="-90" positionY="18" width="128" height="118"/>
         <element name="Word" positionX="-272" positionY="467" width="128" height="148"/>
     </elements>
 </model>

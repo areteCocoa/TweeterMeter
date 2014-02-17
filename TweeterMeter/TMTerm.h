@@ -25,6 +25,7 @@
 @property (strong, nonatomic) NSString *name;
 
 @property (nonatomic) BOOL displayInvalidWords;
+@property (nonatomic) int topStackRefresh; // How long before the top section of the tweet stack should be updated, minutes
 
 @property (strong, nonatomic) NSMutableDictionary *popularWords;
 @property (strong, nonatomic) NSMutableDictionary *popularTags;
