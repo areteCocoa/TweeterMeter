@@ -10,10 +10,6 @@
 
 @interface TMFrequencyViewController ()
 
-@property (strong, nonatomic) IBOutlet UITextView *wordsTextView;
-@property (strong, nonatomic) IBOutlet UITextView *hashtagsTextView;
-@property (strong, nonatomic) IBOutlet UITextView *usersTextView;
-
 @property (strong, nonatomic) IBOutlet UITableView *wordsTableView;
 @property (strong, nonatomic) IBOutlet UITableView *hashtagsTableView;
 @property (strong, nonatomic) IBOutlet UITableView *usersTableView;
@@ -23,7 +19,10 @@
 @property (strong, nonatomic) NSDictionary *hashtagsData;
 @property (strong, nonatomic) NSDictionary *usersData;
 
+@property (strong, nonatomic) NSString *selectedWord;
 @property (strong, nonatomic) NSString *detailData;
+
+@property (nonatomic) NSInteger tableDisplayCount; // How much data do we show in the tables?
 
 - (NSDictionary *)dataForTableView: (UITableView *)tableView;
 - (NSDictionary *)getSortedArrayFromDictionary: (NSDictionary *)dictionary;
@@ -49,6 +48,8 @@ NSString *kWord = @"value";
         [self.usersTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kFrequencyCellIdentifier];
     }
     
+    self.tableDisplayCount = 20;
+    
     return self;
 }
 
@@ -60,32 +61,9 @@ NSString *kWord = @"value";
 - (void)updateView {
     // update views
     if (self.term) {
-        self.wordsTextView.text = @"";
-        self.hashtagsTextView.text = @"";
-        self.usersTextView.text = @"";
-        
-        int count;
-        
         self.wordsData = [self getSortedArrayFromDictionary:self.term.popularWords];
-        NSArray *counts = [self.wordsData valueForKey:kFrequency];
-        NSArray *words = [self.wordsData valueForKey:kWord];
-        for (count = 0; count < counts.count; count ++) {
-            self.wordsTextView.text = [self.wordsTextView.text stringByAppendingString:[NSString stringWithFormat:@"%@: %@\n", [counts objectAtIndex:count], [words objectAtIndex:count]]];
-        }
-        
         self.usersData = [self getSortedArrayFromDictionary:self.term.popularUsers];
-        counts = [self.usersData valueForKey:kFrequency];
-        words = [self.usersData valueForKey:kWord];
-        for (count = 0; count < counts.count; count ++) {
-            self.usersTextView.text = [self.usersTextView.text stringByAppendingString:[NSString stringWithFormat:@"%@: %@\n", [counts objectAtIndex:count], [words objectAtIndex:count]]];
-        }
-        
         self.hashtagsData = [self getSortedArrayFromDictionary:self.term.popularTags];
-        counts = [self.hashtagsData valueForKey:kFrequency];
-        words = [self.hashtagsData valueForKey:kWord];
-        for (count = 0; count < counts.count; count ++) {
-            self.hashtagsTextView.text = [self.hashtagsTextView.text stringByAppendingString:[NSString stringWithFormat:@"%@: %@\n", [counts objectAtIndex:count], [words objectAtIndex:count]]];
-        }
         
         [self.wordsTableView reloadData];
         [self.hashtagsTableView reloadData];
@@ -155,6 +133,10 @@ NSString *kWord = @"value";
     return data;
 }
 
+- (BOOL)tableViewIsDetail: (UITableView *)tableView {
+    return (tableView == self.detailTableView);
+}
+
 #pragma mark - UITableViewDatasource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -175,7 +157,7 @@ NSString *kWord = @"value";
     } else if (tableView == self.detailTableView) {
         cell = [tableView dequeueReusableCellWithIdentifier:kDetailCellIdentifier];
         
-        cell.textLabel.text = self.detailData;
+        cell.textLabel.text = self.selectedWord;
     }
     
     return cell;
@@ -186,11 +168,11 @@ NSString *kWord = @"value";
         NSDictionary *data = [self dataForTableView:tableView];
         int size = [[data objectForKey:kFrequency] count];
         
-        if (size < 5 && size > -1) {
+        if (size < self.tableDisplayCount && size > -1) {
             return size;
         }
         
-        return 5;
+        return self.tableDisplayCount;
     } else if (tableView == self.detailTableView) {
         return 1;
     }
@@ -201,10 +183,13 @@ NSString *kWord = @"value";
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSArray *words = [[self dataForTableView:tableView] objectForKey:kWord];
-    self.detailData = [words objectAtIndex:[indexPath indexAtPosition:1]];
-    
-    [self.detailTableView reloadData];
+    if (![self tableViewIsDetail:tableView]) {
+        // Load example tweets
+        NSArray *words = [[self dataForTableView:tableView] objectForKey:kWord];
+        self.selectedWord = [words objectAtIndex:[indexPath indexAtPosition:1]];
+        
+        [self.detailTableView reloadData];
+    }
 }
 
 @end

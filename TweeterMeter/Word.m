@@ -51,6 +51,21 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     Word *word = [NSEntityDescription insertNewObjectForEntityForName:@"Word" inManagedObjectContext:context];
     word.name = name;
     
+    for (NSString *invalid in [word invalidStrings]) {
+        if ([word.name rangeOfString:invalid].location != NSNotFound) {
+            word.isValid = @0;
+        }
+    }
+    
+    char firstChar = [word.name characterAtIndex:0];
+    if (firstChar == '#') {
+        word.isHashtag = @1;
+    } else if (firstChar == '@') {
+        word.isUser = @1;
+    } else {
+        word.isWord = @1;
+    }
+    
     return word;
 }
 
@@ -89,21 +104,6 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     self.isHashtag = @0;
     self.isUser = @0;
     self.isWord = @0;
-    
-    for (NSString *invalid in [self invalidStrings]) {
-        if ([self.name rangeOfString:invalid].location != NSNotFound) {
-            self.isValid = @0;
-        }
-    }
-    
-    char firstChar = [self.name characterAtIndex:0];
-    if (firstChar == '#') {
-        self.isHashtag = @1;
-    } else if (firstChar == '@') {
-        self.isUser = @1;
-    } else {
-        self.isWord = @1;
-    }
 }
 
 - (void)findType {
@@ -138,12 +138,15 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     [task resume];
      */
     
+    // Lexicon
+    /*
     if ([self.name characterAtIndex:0] == 'a' || [self.name characterAtIndex:0] == 'A') {
         Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
         NSDictionary *word = [dictionaryContext definitionAsDictionaryFor:self.name];
         NSArray *types = [word allKeys];
-        NSLog(@"%@", types);
+        // NSLog(@"%@", types);
     }
+     */
 }
 
 - (NSSet *)invalidStrings {

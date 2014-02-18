@@ -35,8 +35,8 @@
     self.name = managedTerm.name;
     
     // SETTINGS AND OPTIONS
-    self.displayInvalidWords = NO;
-    self.topStackRefresh = 60;
+    self.displayInvalidWords = NO; // Should display words marked as invalid?
+    self.topStackRefresh = 60; // Time (minutes) that tweets should be retreived from top (opposed to bottom)
     
     self.popularWords = [NSMutableDictionary dictionary];
     self.popularTags =  [NSMutableDictionary dictionary];
@@ -138,10 +138,17 @@
                  NSMutableDictionary *params = [@{@"q" : _name,
                                                  @"result_type" : @"recent",
                                                  @"count" : [NSString stringWithFormat:@"%i", number]} mutableCopy];
-                 if (abs([self.managedTerm.maxDate timeIntervalSinceNow]) > 60*60) {
-                     [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.maxID] forKey:@"since_id"];
+                 if (self.managedTerm.tweets.count > 0) {
+                     NSDate *nextUpdate = [self.managedTerm.maxDate dateByAddingTimeInterval:60*self.topStackRefresh];
+                     if ([nextUpdate earlierDate:[NSDate date]] == nextUpdate) {
+                         [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.maxID] forKey:@"since_id"];
+                     } else {
+                         [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.minID] forKey:@"max_id"];
+                     }
+
                  }
                  
+                 NSLog(@"Fetching tweets with parameters: %@", params);
                  
                  NSArray *twitterAccounts = [store accountsWithAccountType:twitterAccountType];
                  NSURL *url = [NSURL URLWithString:@"https://api.twitter.com/1.1/search/tweets.json"];
@@ -233,29 +240,9 @@
     // Analyze Tweet
     if (![self.managedTerm.tweets containsObject:tweet]) {
         [self analyzeTweet:tweet];
+        tweet.term = self.managedTerm;
     }
     
-    if (self.managedTerm.tweets.count == 0) {
-        self.managedTerm.maxDate = tweet.date;
-        self.managedTerm.minDate = tweet.date;
-        self.managedTerm.maxID = tweet.tweetID;
-        self.managedTerm.minID = tweet.tweetID;
-    } else {
-        // Check ID range...
-        if (tweet.tweetID > self.managedTerm.maxID) {
-            self.managedTerm.maxID = tweet.tweetID;
-        } else if (tweet.tweetID < self.managedTerm.minID) {
-            self.managedTerm.minID = tweet.tweetID;
-        }
-        // And date range...
-        if ([tweet.date earlierDate:self.managedTerm.minDate] == tweet.date) {
-            self.managedTerm.minDate = tweet.date;
-        } else if ([tweet.date laterDate:self.managedTerm.maxDate] == tweet.date) {
-            self.managedTerm.maxDate = tweet.date;
-        }
-    }
-    
-    tweet.term = self.managedTerm;
     // [self.delegate tweetsDidUpdate];
 }
 
@@ -281,6 +268,25 @@
             if (self.displayInvalidWords || [frequencyObject.parentWord.isValid isEqualToNumber:@1]) {
                 [self countString:frequencyObject.name];
             }
+        }
+    }
+    
+    // Set managed term tracking of our data's position relative to other data
+    if (!self.managedTerm.maxDate || !self.managedTerm.minDate || self.managedTerm.minID == 0|| self.managedTerm.maxID == 0) {
+        if (!self.managedTerm.maxDate) self.managedTerm.maxDate = tweet.date;
+        if (!self.managedTerm.minDate) self.managedTerm.minDate = tweet.date;
+        if (self.managedTerm.minID == 0) self.managedTerm.minID = tweet.tweetID;
+        if (self.managedTerm.maxID == 0) self.managedTerm.maxID = tweet.tweetID;
+    } else {
+        if ([self.managedTerm.maxDate laterDate:tweet.date] == tweet.date) {
+            self.managedTerm.maxDate = tweet.date;
+        } else if ([self.managedTerm.minDate earlierDate:tweet.date] == tweet.date) {
+            self.managedTerm.minDate = tweet.date;
+        }
+        if (self.managedTerm.maxID < tweet.tweetID) {
+            self.managedTerm.maxID = tweet.tweetID;
+        } else if (self.managedTerm.minID > tweet.tweetID) {
+            self.managedTerm.minID = tweet.tweetID;
         }
     }
     
