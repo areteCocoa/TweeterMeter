@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		541738F118B3DCE500CDA2B7 /* LexicontextAssets.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 541738EF18B3DCE500CDA2B7 /* LexicontextAssets.bundle */; };
+		541738F218B3DCE500CDA2B7 /* libLexicontext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 541738F018B3DCE500CDA2B7 /* libLexicontext.a */; };
 		5444FF5E187DDB6800B8C225 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5444FF5D187DDB6800B8C225 /* QuartzCore.framework */; };
 		5457EB3718A97E95005E400F /* TMInvalidStringLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5457EB3618A97E95005E400F /* TMInvalidStringLoader.m */; };
 		547495DF18674D1900B969DB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547495DE18674D1900B969DB /* Social.framework */; };
 		548EB46318B28162008F34C2 /* XYPieChart.m in Sources */ = {isa = PBXBuildFile; fileRef = 548EB46218B28162008F34C2 /* XYPieChart.m */; };
-		548EB46718B2827C008F34C2 /* LexicontextAssets.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 548EB46518B2827C008F34C2 /* LexicontextAssets.bundle */; };
-		548EB46818B2827C008F34C2 /* libLexicontext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 548EB46618B2827C008F34C2 /* libLexicontext.a */; };
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
 		549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18711878DCDF0017D41E /* TMFrequencyViewController.m */; };
 		549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */; };
@@ -57,15 +57,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		541738EE18B3DCE500CDA2B7 /* Lexicontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lexicontext.h; sourceTree = "<group>"; };
+		541738EF18B3DCE500CDA2B7 /* LexicontextAssets.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LexicontextAssets.bundle; sourceTree = "<group>"; };
+		541738F018B3DCE500CDA2B7 /* libLexicontext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLexicontext.a; sourceTree = "<group>"; };
 		5444FF5D187DDB6800B8C225 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5457EB3518A97E95005E400F /* TMInvalidStringLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMInvalidStringLoader.h; sourceTree = "<group>"; };
 		5457EB3618A97E95005E400F /* TMInvalidStringLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMInvalidStringLoader.m; sourceTree = "<group>"; };
 		547495DE18674D1900B969DB /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		548EB46118B28162008F34C2 /* XYPieChart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XYPieChart.h; path = TweeterMeter/XYPieChart.h; sourceTree = SOURCE_ROOT; };
 		548EB46218B28162008F34C2 /* XYPieChart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XYPieChart.m; path = TweeterMeter/XYPieChart.m; sourceTree = SOURCE_ROOT; };
-		548EB46418B2827C008F34C2 /* Lexicontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lexicontext.h; sourceTree = "<group>"; };
-		548EB46518B2827C008F34C2 /* LexicontextAssets.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LexicontextAssets.bundle; sourceTree = "<group>"; };
-		548EB46618B2827C008F34C2 /* libLexicontext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLexicontext.a; sourceTree = "<group>"; };
 		549D186D1878DCB70017D41E /* TMChartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMChartViewController.h; sourceTree = "<group>"; };
 		549D186E1878DCB70017D41E /* TMChartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMChartViewController.m; sourceTree = "<group>"; };
 		549D18701878DCDF0017D41E /* TMFrequencyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMFrequencyViewController.h; sourceTree = "<group>"; };
@@ -127,7 +127,7 @@
 				54E0AFBC18667C7B00EA5100 /* CoreData.framework in Frameworks */,
 				54E0AFBA18667C7B00EA5100 /* UIKit.framework in Frameworks */,
 				54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */,
-				548EB46818B2827C008F34C2 /* libLexicontext.a in Frameworks */,
+				541738F218B3DCE500CDA2B7 /* libLexicontext.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,9 +158,9 @@
 		548EB46918B29095008F34C2 /* Lexicontext */ = {
 			isa = PBXGroup;
 			children = (
-				548EB46418B2827C008F34C2 /* Lexicontext.h */,
-				548EB46518B2827C008F34C2 /* LexicontextAssets.bundle */,
-				548EB46618B2827C008F34C2 /* libLexicontext.a */,
+				541738EE18B3DCE500CDA2B7 /* Lexicontext.h */,
+				541738EF18B3DCE500CDA2B7 /* LexicontextAssets.bundle */,
+				541738F018B3DCE500CDA2B7 /* libLexicontext.a */,
 			);
 			name = Lexicontext;
 			sourceTree = "<group>";
@@ -361,7 +361,7 @@
 				54E0AFD618667C7B00EA5100 /* Images.xcassets in Resources */,
 				54E0AFC218667C7B00EA5100 /* InfoPlist.strings in Resources */,
 				54E0AFCB18667C7B00EA5100 /* Main.storyboard in Resources */,
-				548EB46718B2827C008F34C2 /* LexicontextAssets.bundle in Resources */,
+				541738F118B3DCE500CDA2B7 /* LexicontextAssets.bundle in Resources */,
 				54D34EE418A889DD0004556D /* filter_strings.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

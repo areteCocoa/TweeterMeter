@@ -97,6 +97,20 @@
     return self;
 }
 
+- (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string {
+    NSSet *filteredTweets = [self.managedTerm.tweets objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+        Tweet *tweet = (Tweet *)obj;
+        return ([tweet.text rangeOfString:string].location != NSNotFound);
+    }];
+    
+    NSMutableArray *array = [[filteredTweets sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]] mutableCopy];
+    while (array.count > numberOfTweets) {
+        [array removeLastObject];
+    }
+    
+    return array;
+}
+
 - (void)countString: (NSString *)word {
     char firstCharacter = [word characterAtIndex:0];
     NSMutableDictionary *dictionary;
@@ -199,7 +213,7 @@
              }
              else {
                  // Access was not granted, or an error occurred
-                 NSLog(@"%@", [error localizedDescription]);
+                 NSLog(@"Access not granted to twitter. Error: %@", [error localizedDescription]);
              }
          }];
     }

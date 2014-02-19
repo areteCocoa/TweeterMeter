@@ -34,5 +34,6 @@
 @property id <TMTermDelegate> delegate;
 
 - (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context;
+- (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string;
 
 @end

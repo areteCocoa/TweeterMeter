@@ -138,13 +138,19 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     [task resume];
      */
     
-    // Lexicon
+    // Look up definition, invalidates invalid words
     /*
-    if ([self.name characterAtIndex:0] == 'a' || [self.name characterAtIndex:0] == 'A') {
-        Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
+    Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
+    if ([dictionaryContext containsDefinitionFor:self.name]) {
         NSDictionary *word = [dictionaryContext definitionAsDictionaryFor:self.name];
         NSArray *types = [word allKeys];
-        // NSLog(@"%@", types);
+        if (types.count == 1) {
+            self.type = [types firstObject];
+        } else if ((!types || types.count == 0) && self.isWord) {
+            self.isValid = @0;
+        }
+    } else if (self.isWord) {
+        self.isValid = @0;
     }
      */
 }

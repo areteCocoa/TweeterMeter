@@ -20,9 +20,10 @@
 @property (strong, nonatomic) NSDictionary *usersData;
 
 @property (strong, nonatomic) NSString *selectedWord;
-@property (strong, nonatomic) NSString *detailData;
+@property (strong, nonatomic) NSArray *detailData;
 
-@property (nonatomic) NSInteger tableDisplayCount; // How much data do we show in the tables?
+@property (nonatomic) NSInteger tableDisplayCount; // How much data do we show in the non-detail tables?
+@property (nonatomic) NSInteger detailDisplayCount;
 
 - (NSDictionary *)dataForTableView: (UITableView *)tableView;
 - (NSDictionary *)getSortedArrayFromDictionary: (NSDictionary *)dictionary;
@@ -38,6 +39,8 @@ NSString *kWord = @"value";
 
 @implementation TMFrequencyViewController
 
+@synthesize detailData = _detailData;
+
 - (id)initWithTerm: (TMTerm *)term {
     self = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"frequency"];
     
@@ -48,7 +51,8 @@ NSString *kWord = @"value";
         [self.usersTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kFrequencyCellIdentifier];
     }
     
-    self.tableDisplayCount = 20;
+    self.tableDisplayCount = 50;
+    self.detailDisplayCount = 50;
     
     return self;
 }
@@ -68,7 +72,19 @@ NSString *kWord = @"value";
         [self.wordsTableView reloadData];
         [self.hashtagsTableView reloadData];
         [self.usersTableView reloadData];
+        
+        if (self.selectedWord) {
+            [self updateDetailTable];
+        }
     }
+}
+
+- (void)updateDetailTable {
+    if (self.selectedWord) {
+        self.detailData =[self.term tweetsWithNumber:self.detailDisplayCount containingString:self.selectedWord];
+    }
+    
+    [self.detailTableView reloadData];
 }
 
 - (NSDictionary *)getSortedArrayFromDictionary: (NSDictionary *)dictionary {
@@ -142,10 +158,10 @@ NSString *kWord = @"value";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
     
+    int index = [indexPath indexAtPosition:1];
+    
     if (tableView == self.wordsTableView || tableView == self.hashtagsTableView || tableView == self.usersTableView) {
         cell = [tableView dequeueReusableCellWithIdentifier:kFrequencyCellIdentifier];
-        
-        int index = [indexPath indexAtPosition:1];
         
         NSDictionary *data = [self dataForTableView:tableView];
         
@@ -157,7 +173,9 @@ NSString *kWord = @"value";
     } else if (tableView == self.detailTableView) {
         cell = [tableView dequeueReusableCellWithIdentifier:kDetailCellIdentifier];
         
-        cell.textLabel.text = self.selectedWord;
+        Tweet *tweet = self.detailData[index];
+        cell.textLabel.text = tweet.user;
+        cell.detailTextLabel.text = tweet.text;
     }
     
     return cell;
@@ -174,7 +192,12 @@ NSString *kWord = @"value";
         
         return self.tableDisplayCount;
     } else if (tableView == self.detailTableView) {
-        return 1;
+        int size = [self.detailData count];
+        
+        if (size < self.detailDisplayCount) {
+            return size;
+        }
+        return self.detailDisplayCount;
     }
     
     return 0;
@@ -187,8 +210,7 @@ NSString *kWord = @"value";
         // Load example tweets
         NSArray *words = [[self dataForTableView:tableView] objectForKey:kWord];
         self.selectedWord = [words objectAtIndex:[indexPath indexAtPosition:1]];
-        
-        [self.detailTableView reloadData];
+        [self updateDetailTable];
     }
 }
 

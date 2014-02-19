@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="DisplaySettings" syncable="YES">
+        <attribute name="displayArticles" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="displayConjunctions" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="displayInvalidWords" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="displayPrepositions" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="displayTerm" optional="YES" attributeType="Boolean" defaultValueString="YES" syncable="YES"/>
+        <attribute name="minimumStringCount" optional="YES" attributeType="Integer 16" minValueString="0" defaultValueString="2" syncable="YES"/>
+        <attribute name="proportionOfInvalidAllowed" optional="YES" attributeType="Float" minValueString="0" maxValueString="1" defaultValueString="0.7" syncable="YES"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="displaySettings" inverseEntity="Term" syncable="YES"/>
+    </entity>
     <entity name="FrequencyObject" representedClassName="FrequencyObject" isAbstract="YES" syncable="YES">
         <attribute name="frequency" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
@@ -23,6 +33,7 @@
         <attribute name="minDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="minID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="displaySettings" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DisplaySettings" inverseName="term" inverseEntity="DisplaySettings" syncable="YES"/>
         <relationship name="frequencyTags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyTag" inverseName="term" inverseEntity="FrequencyTag" syncable="YES"/>
         <relationship name="frequencyUsers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyUser" inverseName="term" inverseEntity="FrequencyUser" syncable="YES"/>
         <relationship name="frequencyWords" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyWord" inverseName="term" inverseEntity="FrequencyWord" syncable="YES"/>
@@ -50,8 +61,9 @@
         <element name="FrequencyTag" positionX="-461" positionY="306" width="128" height="58"/>
         <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="58"/>
         <element name="FrequencyWord" positionX="-90" positionY="266" width="128" height="58"/>
-        <element name="Term" positionX="-324" positionY="18" width="128" height="193"/>
+        <element name="Term" positionX="-324" positionY="18" width="128" height="208"/>
         <element name="Tweet" positionX="-90" positionY="18" width="128" height="118"/>
         <element name="Word" positionX="-272" positionY="467" width="128" height="148"/>
+        <element name="DisplaySettings" positionX="-576" positionY="90" width="128" height="163"/>
     </elements>
 </model>
