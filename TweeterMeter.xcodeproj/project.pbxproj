@@ -22,6 +22,7 @@
 		54D2B8531890529C00F42BD4 /* FrequencyTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B8521890529C00F42BD4 /* FrequencyTag.m */; };
 		54D2B8561890529C00F42BD4 /* FrequencyWord.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B8551890529C00F42BD4 /* FrequencyWord.m */; };
 		54D2B85C189053F800F42BD4 /* Word.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2B85B189053F800F42BD4 /* Word.m */; };
+		54D2BAD918B581C40067212E /* DisplaySettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D2BAD818B581C40067212E /* DisplaySettings.m */; };
 		54D34EE418A889DD0004556D /* filter_strings.xml in Resources */ = {isa = PBXBuildFile; fileRef = 54D34EE318A889DD0004556D /* filter_strings.xml */; };
 		54D9C395186B64290078456B /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D9C394186B64290078456B /* Tweet.m */; };
 		54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54E0AFB518667C7B00EA5100 /* Foundation.framework */; };
@@ -84,6 +85,8 @@
 		54D2B8551890529C00F42BD4 /* FrequencyWord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyWord.m; sourceTree = "<group>"; };
 		54D2B85A189053F800F42BD4 /* Word.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Word.h; sourceTree = "<group>"; };
 		54D2B85B189053F800F42BD4 /* Word.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Word.m; sourceTree = "<group>"; };
+		54D2BAD718B581C40067212E /* DisplaySettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplaySettings.h; sourceTree = "<group>"; };
+		54D2BAD818B581C40067212E /* DisplaySettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplaySettings.m; sourceTree = "<group>"; };
 		54D34EE318A889DD0004556D /* filter_strings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = filter_strings.xml; sourceTree = "<group>"; };
 		54D9C393186B64290078456B /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		54D9C394186B64290078456B /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
@@ -220,6 +223,8 @@
 				54E0AFCC18667C7B00EA5100 /* TweeterMeter.xcdatamodeld */,
 				5457EB3518A97E95005E400F /* TMInvalidStringLoader.h */,
 				5457EB3618A97E95005E400F /* TMInvalidStringLoader.m */,
+				54D2BAD718B581C40067212E /* DisplaySettings.h */,
+				54D2BAD818B581C40067212E /* DisplaySettings.m */,
 				54D2B85A189053F800F42BD4 /* Word.h */,
 				54D2B85B189053F800F42BD4 /* Word.m */,
 				54D2B8541890529C00F42BD4 /* FrequencyWord.h */,
@@ -384,6 +389,7 @@
 				54C234691888590E0033ECB0 /* Term.m in Sources */,
 				54D2B8531890529C00F42BD4 /* FrequencyTag.m in Sources */,
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
+				54D2BAD918B581C40067212E /* DisplaySettings.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */,
 				54E0AFC418667C7B00EA5100 /* main.m in Sources */,

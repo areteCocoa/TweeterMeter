@@ -139,10 +139,9 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
      */
     
     // Look up definition, invalidates invalid words
-    /*
     Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
-    if ([dictionaryContext containsDefinitionFor:self.name]) {
-        NSDictionary *word = [dictionaryContext definitionAsDictionaryFor:self.name];
+    NSDictionary *word = [dictionaryContext definitionAsDictionaryFor:self.name];
+    if (word) {
         NSArray *types = [word allKeys];
         if (types.count == 1) {
             self.type = [types firstObject];
@@ -152,7 +151,6 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     } else if (self.isWord) {
         self.isValid = @0;
     }
-     */
 }
 
 - (NSSet *)invalidStrings {

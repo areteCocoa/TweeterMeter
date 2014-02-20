@@ -23,5 +23,6 @@
 @dynamic frequencyUsers;
 @dynamic frequencyWords;
 @dynamic tweets;
+@dynamic displaySettings;
 
 @end

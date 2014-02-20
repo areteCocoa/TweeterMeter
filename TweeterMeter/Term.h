@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "DisplaySettings.h"
 
 @class FrequencyWord, Tweet;
 
@@ -23,6 +24,7 @@
 @property (nonatomic, retain) NSSet *frequencyUsers;
 @property (nonatomic, retain) NSSet *frequencyWords;
 @property (nonatomic, retain) NSSet *tweets;
+@property (nonatomic, retain) DisplaySettings *displaySettings;
 @end
 
 @interface Term (CoreDataGeneratedAccessors)

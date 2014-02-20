@@ -98,11 +98,14 @@
 }
 
 - (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string {
+    // Get tweets that only match the string and are longer than the minimumStringCount
     NSSet *filteredTweets = [self.managedTerm.tweets objectsPassingTest:^BOOL(id obj, BOOL *stop) {
         Tweet *tweet = (Tweet *)obj;
-        return ([tweet.text rangeOfString:string].location != NSNotFound);
+        BOOL tweetContainsString = ([tweet.text rangeOfString:string].location != NSNotFound);
+        return tweetContainsString;
     }];
     
+    // Sort by date
     NSMutableArray *array = [[filteredTweets sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]] mutableCopy];
     while (array.count > numberOfTweets) {
         [array removeLastObject];
@@ -112,22 +115,58 @@
 }
 
 - (void)countString: (NSString *)word {
-    char firstCharacter = [word characterAtIndex:0];
-    NSMutableDictionary *dictionary;
-    if (firstCharacter == '#') {
-        dictionary = self.popularTags;
-    } else if (firstCharacter == '@') {
-        dictionary = self.popularUsers;
-    } else {
-        dictionary = self.popularWords;
+    if ([self shouldAddString:word]) {
+        char firstCharacter = [word characterAtIndex:0];
+        NSMutableDictionary *dictionary;
+        if (firstCharacter == '#') {
+            dictionary = self.popularTags;
+        } else if (firstCharacter == '@') {
+            dictionary = self.popularUsers;
+        } else {
+            dictionary = self.popularWords;
+        }
+        
+        NSNumber *oldValue = [dictionary objectForKey:word];
+        if (!oldValue) {
+            [dictionary setObject:@1 forKey:word];
+        } else {
+            [dictionary setObject:@([oldValue intValue] + 1) forKey:word];
+        }
+    }
+}
+
+- (BOOL)shouldAddString: (NSString *)string {
+    // Reject strings less than length of minimumStringCount
+    if ([self.managedTerm.displaySettings.minimumStringCount integerValue] > string.length) {
+        return NO;
     }
     
-    NSNumber *oldValue = [dictionary objectForKey:word];
-    if (!oldValue) {
-        [dictionary setObject:@1 forKey:word];
-    } else {
-        [dictionary setObject:@([oldValue intValue] + 1) forKey:word];
+    // Reject articles if toggled
+    if ([self.managedTerm.displaySettings.displayArticles isEqualToNumber:@0]) {
+        //
     }
+    
+    // Reject conjunctions if toggled
+    if ([self.managedTerm.displaySettings.displayConjunctions isEqualToNumber:@0]) {
+        //
+    }
+    
+    // Reject invalid words if toggled
+    if ([self.managedTerm.displaySettings.displayInvalidWords isEqualToNumber:@0]) {
+        //
+    }
+    
+    // Reject prepositions if toggled
+    if ([self.managedTerm.displaySettings.displayPrepositions isEqualToNumber:@0]) {
+        //
+    }
+    
+    // Reject term words if toggled
+    if ([self.managedTerm.displaySettings.displayTerm isEqualToNumber:@0]) {
+        //
+    }
+    
+    return YES;
 }
 
 #pragma mark Twitter Methods
@@ -279,9 +318,7 @@
             frequencyObject = [self getFrequencyObjectWithName:wordString];
             [frequencyObject addOneToFrequency];
             
-            if (self.displayInvalidWords || [frequencyObject.parentWord.isValid isEqualToNumber:@1]) {
-                [self countString:frequencyObject.name];
-            }
+            [self countString:frequencyObject.name];
         }
     }
     

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="DisplaySettings" syncable="YES">
+    <entity name="DisplaySettings" representedClassName="DisplaySettings" syncable="YES">
         <attribute name="displayArticles" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="displayConjunctions" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="displayInvalidWords" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
@@ -57,6 +57,7 @@
         <relationship name="frequencyObject" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FrequencyObject" inverseName="parentWord" inverseEntity="FrequencyObject" syncable="YES"/>
     </entity>
     <elements>
+        <element name="DisplaySettings" positionX="-576" positionY="90" width="128" height="163"/>
         <element name="FrequencyObject" positionX="-594" positionY="486" width="128" height="88"/>
         <element name="FrequencyTag" positionX="-461" positionY="306" width="128" height="58"/>
         <element name="FrequencyUser" positionX="-279" positionY="297" width="128" height="58"/>
@@ -64,6 +65,5 @@
         <element name="Term" positionX="-324" positionY="18" width="128" height="208"/>
         <element name="Tweet" positionX="-90" positionY="18" width="128" height="118"/>
         <element name="Word" positionX="-272" positionY="467" width="128" height="148"/>
-        <element name="DisplaySettings" positionX="-576" positionY="90" width="128" height="163"/>
     </elements>
 </model>
