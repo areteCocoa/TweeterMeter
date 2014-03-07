@@ -88,7 +88,7 @@
     CGFloat navigationHeight = self.navigationController.navigationBar.frame.size.height;
     CGFloat height = 50;
     self.currentProcessViewController = [[TMCurrentProcessViewController alloc] init];
-    self.currentProcessViewController.view.frame = CGRectMake(0, navigationHeight + 10, self.view.frame.size.width, height);
+    self.currentProcessViewController.view.frame = CGRectMake(0, navigationHeight + 20, self.view.frame.size.width, height);
     self.currentProcessViewController.view.backgroundColor = [UIColor colorWithWhite:1 alpha:.5];
     [self addChildViewController: self.currentProcessViewController];
     [self.view addSubview: self.currentProcessViewController.view];
@@ -176,6 +176,13 @@
         // Pass data to the VCs
         [self.currentProcessViewController showLabelViewWithText:@"Tweets successfully saved to database!"];
         [self updateSubviews];
+    });
+}
+
+- (void)noResponseData {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Pass data to the VCs
+        [self.currentProcessViewController showLabelViewWithText:@"No response data from twitter! (No internet connection)"];
     });
 }
 

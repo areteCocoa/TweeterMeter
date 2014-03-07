@@ -16,6 +16,8 @@
 
 @property (strong, nonatomic) Term *managedTerm;
 @property (strong, nonatomic) NSManagedObjectContext *context;
+@property (strong, nonatomic) NSManagedObjectContext *userInterfaceContext; // Context that data on the interface is on
+@property (strong, nonatomic) NSLock *addTweetLock;
 @property (strong, nonatomic) NSEntityDescription *entity;
 @property (strong, nonatomic) NSPersistentStoreCoordinator *store;
 
@@ -24,6 +26,7 @@
 
 @property (strong, nonatomic) NSString *termState;
 @property (nonatomic) BOOL hasReachedBottomOfTweets;
+@property (nonatomic) NSInteger tweetCount;
 
 @end
 
@@ -43,23 +46,17 @@
     
     self.queue = [[NSOperationQueue alloc] init];
     self.hasReachedBottomOfTweets = NO;
+    self.isFetchingTweets = NO;
+    self.shouldFetchTweets = NO;
     
-    self.context = [[NSManagedObjectContext alloc] init];
-    [self.context setPersistentStoreCoordinator:context.persistentStoreCoordinator];
-    NSFetchRequest *fetch = [[NSFetchRequest alloc] init];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", self.name];
-    [fetch setPredicate:predicate];
-    [fetch setEntity:managedTerm.entity];
+    self.addTweetLock = [[NSLock alloc] init];
+    self.userInterfaceContext = [[NSManagedObjectContext alloc] init];
+    [self.userInterfaceContext setPersistentStoreCoordinator:context.persistentStoreCoordinator];
     
-    NSError *error;
-    NSArray *array = [self.context executeFetchRequest:fetch error:&error];
-    if (!error) {
-        if ([[array firstObject] isKindOfClass:[Term class]]) {
-            self.managedTerm = [array firstObject];
-        }
-    } else {
-        NSLog(@"Error: %@", error);
-    }
+    self.managedTerm = managedTerm;
+    self.tweetCount = self.managedTerm.tweets.count;
+    
+    [self changeContext];
     
     // SETTINGS AND OPTIONS
     self.topStackRefresh = 360; // Time (minutes) that tweets should be retreived from top (opposed to bottom)
@@ -91,9 +88,14 @@
 }
 
 - (NSArray *)newestTweets:(NSInteger)numberOfTweets {
-    NSSet *tweets = [self.managedTerm.tweets copy];
+    NSSet *tweetsCopy = [self.managedTerm.tweets mutableCopy];
+    NSMutableSet *tweetsCorrectedContext = [NSMutableSet set];
+    for (Tweet *tweet in tweetsCopy) {
+        Tweet *correctContextTweet = (Tweet*)[self.userInterfaceContext objectWithID:tweet.objectID];
+         [tweetsCorrectedContext addObject:correctContextTweet];
+    }
     
-    NSMutableArray *tweetsArray = [[self sortTweetsByDate:tweets] mutableCopy];
+    NSMutableArray *tweetsArray = [[self sortTweetsByDate:tweetsCorrectedContext] mutableCopy];
     while (tweetsArray.count > numberOfTweets) {
         [tweetsArray removeLastObject];
     }
@@ -102,7 +104,7 @@
 }
 
 - (NSInteger)numberOfTweets {
-    return self.managedTerm.tweets.count;
+    return self.tweetCount;
 }
 
 - (NSInteger)numberOfTweetsWithConnotation:(NSString *)connotation {
@@ -111,7 +113,13 @@
 
 // Returns a set of tweet objects in an unsorted set
 - (NSArray *)tweetsWithConnotation:(NSString *)connotation {
-    NSSet *set = [self.managedTerm.tweets objectsPassingTest:^BOOL(id obj, BOOL* test) {
+    NSSet *tweetsCopy = [self.managedTerm.tweets mutableCopy];
+    NSMutableSet *tweetsCorrectedContext = [NSMutableSet set];
+    for (Tweet *tweet in tweetsCopy) {
+        Tweet *correctContextTweet = (Tweet *)[self.userInterfaceContext objectWithID:tweet.objectID];
+        [tweetsCorrectedContext addObject:correctContextTweet];
+    }
+    NSSet *set = [tweetsCorrectedContext objectsPassingTest:^BOOL(id obj, BOOL* test) {
         Tweet *tweet = (Tweet *)obj;
         return [tweet.connotation isEqualToString:connotation];
     }];
@@ -123,8 +131,14 @@
 
 - (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string {
     // Get tweets that only match the string
-    NSSet *tweetsCopy = [self.managedTerm.tweets copy];
-    NSSet *filteredTweets = [tweetsCopy objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+    NSSet *tweetsCopy = [self.managedTerm.tweets mutableCopy];
+    NSMutableSet *tweetsCorrectedContext =[NSMutableSet set];
+    for (Tweet *tweet in tweetsCopy) {
+        Tweet *correctContextTweet = (Tweet*)[self.userInterfaceContext objectWithID:tweet.objectID];
+        [tweetsCorrectedContext addObject:correctContextTweet];
+    }
+    
+    NSSet *filteredTweets = [tweetsCorrectedContext objectsPassingTest:^BOOL(id obj, BOOL *stop) {
         Tweet *tweet = (Tweet *)obj;
         BOOL tweetContainsString = ([[tweet.text lowercaseString] rangeOfString:string].location != NSNotFound);
         return tweetContainsString;
@@ -156,9 +170,11 @@
 }
 
 - (void)beginFetchingTweetsOnOperationQueue:(NSOperationQueue *)queue {
+    self.shouldFetchTweets = YES;
     if (queue) {
         self.queue = queue;
     }
+    queue.maxConcurrentOperationCount = 1;
     [self fetchMaxTweetsOnQueue];
 }
 
@@ -169,7 +185,7 @@
 }
 
 - (void)fetchMaxTweets {
-    [self fetchNumberOfTweets:100 withContext:self.context];
+    [self fetchNumberOfTweets:100];
 }
 
 - (void)countWord: (Word *)word {
@@ -197,7 +213,9 @@
     DisplaySettings *settings = self.managedTerm.displaySettings;
     
     // Reject strings less than length of minimumStringCount
-    if ([settings.minimumStringCount intValue] > word.name.length) {
+    int minimumStringCount = [settings.minimumStringCount intValue];
+    int wordLength = [word stringLength];
+    if (minimumStringCount > wordLength) {
         return NO;
     }
     
@@ -237,10 +255,12 @@
 #pragma mark Twitter Methods
 
 - (void)fetchMaxTweetsOnQueue {
+    // NSInvocationOperation *saveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(saveContext:) object:self.context];
     [self.queue addOperations:@[self.fetchTweetsOperation] waitUntilFinished:YES];
 }
 
-- (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
+- (void)fetchNumberOfTweets:(int)number {
+    self.isFetchingTweets = YES;
     [self.delegate attemptingToConnectToTwitter];
     
     ACAccountStore *store = [[ACAccountStore alloc] init];
@@ -298,13 +318,15 @@
                                       float total = statusesArray.count;
                                       [self.delegate startedLoadingTweetsFromRequest:total];
                                       
+                                      [self changeContext];
+                                      
                                       for (NSDictionary *dictionary in statuses) {
-                                          [self addTweet:dictionary inContext:context];
+                                          [self addTweet:dictionary inContext:self.context];
                                           count++;
                                           [self.delegate tweetsHaveLoadedPercent:count/total];
                                       }
                                       [self.delegate tweetsDidFinishParsing];
-                                      if ([self saveContext:context]) {
+                                      if ([self saveContext:self.context]) {
                                           [self.delegate tweetsDidSave];
                                       }
                                       
@@ -312,19 +334,25 @@
                                       if (verbosePrintTweets) {
                                           NSLog(@"%@", statuses);
                                       }
-                                      [self fetchMaxTweetsOnQueue];
+                                      self.isFetchingTweets = NO;
+                                      if (self.shouldFetchTweets) {
+                                          [self fetchMaxTweetsOnQueue];
+                                      }
                                   }
                               }
                               else {
                                   // Our JSON deserialization went awry
                                   NSLog(@"JSON Error: %@", [jsonError localizedDescription]);
                               }
-                          }
-                          else {
+                          } else {
                               // The server did not respond ... were we rate-limited?
                               NSLog(@"The response status code is %ld",
                                     (long)urlResponse.statusCode);
                           }
+                      } else {
+                          NSLog(@"No response data!");
+                          self.isFetchingTweets = NO;
+                          [self.delegate noResponseData];
                       }
                   }];
              }
@@ -337,48 +365,46 @@
 }
 
 - (void)addTweet: (NSDictionary *)rawTweet inContext: (NSManagedObjectContext *)context {
-    [context lock];
-    
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
-    Tweet *tweet;
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text == %@", [rawTweet objectForKey:@"text"]];
-    NSFetchRequest* fetch = [[NSFetchRequest alloc] init];
-    [fetch setPredicate:predicate];
-    [fetch setEntity:entity];
-    
-    NSError *error;
-    NSArray *array = [context executeFetchRequest:fetch error:&error];
-    if (error) {
-        NSLog(@"Error! %@", error);
-    } else if ([array firstObject]) {
-        id object = [array firstObject];
-        if ([object isKindOfClass:[Tweet class]]) {
-            tweet = object;
-        }
-    } else {
-        tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        tweet.userName = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
-        tweet.userScreenName = [[rawTweet valueForKey:@"user"] valueForKey:@"screen_name"];
-        tweet.text = [rawTweet valueForKey:@"text"];
-        tweet.tweetID = [rawTweet valueForKey:@"id"];
+    @synchronized (self.addTweetLock) {
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
+        Tweet *tweet;
         
-        // Convert twitter date string to NSDate
-        NSString *creationDate = [[rawTweet valueForKey:@"created_at"] substringFromIndex:4];
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"MM dd HH:mm:ss '+0000' yyyy"];
-        NSDate *date = [formatter dateFromString:creationDate];
-        tweet.date = date;
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text == %@", [rawTweet objectForKey:@"text"]];
+        NSFetchRequest* fetch = [[NSFetchRequest alloc] init];
+        [fetch setPredicate:predicate];
+        [fetch setEntity:entity];
+        
+        NSError *error;
+        NSArray *array = [context executeFetchRequest:fetch error:&error];
+        if (error) {
+            NSLog(@"Error! %@", error);
+        } else if ([array firstObject]) {
+            id object = [array firstObject];
+            if ([object isKindOfClass:[Tweet class]]) {
+                tweet = object;
+            }
+        } else {
+            tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+            tweet.userName = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
+            tweet.userScreenName = [[rawTweet valueForKey:@"user"] valueForKey:@"screen_name"];
+            tweet.text = [rawTweet valueForKey:@"text"];
+            tweet.tweetID = [rawTweet valueForKey:@"id"];
+            
+            // Convert twitter date string to NSDate
+            NSString *creationDate = [[rawTweet valueForKey:@"created_at"] substringFromIndex:4];
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"MM dd HH:mm:ss '+0000' yyyy"];
+            NSDate *date = [formatter dateFromString:creationDate];
+            tweet.date = date;
+        }
+        
+        // Analyze Tweet
+        if (![self.managedTerm.tweets containsObject:tweet]) {
+            [self analyzeTweet:tweet];
+            tweet.term = self.managedTerm;
+            self.tweetCount++;
+        }
     }
-    
-    // Analyze Tweet
-    if (![self.managedTerm.tweets containsObject:tweet]) {
-        [self analyzeTweet:tweet];
-        tweet.term = self.managedTerm;
-    }
-    
-    // [self.delegate tweetsDidUpdate];
-    [context unlock];
 }
 
 // Goes through tweet looking for certain words
@@ -547,12 +573,10 @@
     return YES;
 }
 
-- (NSString *)state {
-    return self.termState;
-}
-
-- (NSManagedObjectID *)objectID {
-    return self.managedTerm.objectID;
+- (void)changeContext {
+    self.context = [[NSManagedObjectContext alloc] init];
+    [self.context setPersistentStoreCoordinator:self.store];
+    self.managedTerm = (Term *)[self.context objectWithID:self.managedTerm.objectID];
 }
  
 @end

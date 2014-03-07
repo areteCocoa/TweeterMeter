@@ -11,6 +11,8 @@
 
 @interface Word()
 
+@property (nonatomic, retain) NSOperationQueue *synonymQueue;
+
 - (NSSet *)invalidStrings;
 - (NSDictionary *)baseConnotations;
 
@@ -33,6 +35,10 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
 @dynamic frequencyObject;
 @dynamic synonyms;
 
+@synthesize stringLength = _stringLength;
+@synthesize isFindingSynonyms;
+@synthesize synonymQueue;
+
 - (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context {
     self = [self initWordWithName:name inContext:context withConnotation:nil];
     
@@ -44,8 +50,9 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     self = [Word createWordWithName:name inContext:context];
     [self fetchDictionaryData];
     
-    // Set connotation if passed, then find other words with similar connotations
-    
+    if (self.isFindingSynonyms && self.synonymQueue) {
+        while ([self.synonymQueue operations].count > 0);
+    }
     
     return self;
 }
@@ -119,6 +126,19 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     self.isWord = @0;
 }
 
+- (void)awakeFromFetch {
+    [super awakeFromFetch];
+    
+    self.stringLength = self.name.length;
+}
+
+- (NSInteger)stringLength {
+    if (_stringLength == 0 && self.name.length != 0) {
+        _stringLength = self.name.length;
+    }
+    return _stringLength;
+}
+
 - (void)fetchDictionaryData {
     // Find type from dictionary API
     self.type = nil;
@@ -184,10 +204,11 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
                 [wordsWithConnotations addObject:word];
             }
             
-            NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-            queue.maxConcurrentOperationCount = 1;
+            self.synonymQueue = [[NSOperationQueue alloc] init];
+            self.synonymQueue.maxConcurrentOperationCount = 1;
             
-            [self setConnotationsOfSynonymsWithSetOfAlreadySet:wordsWithConnotations onOperationQueue:queue];
+            self.isFindingSynonyms = YES;
+            [self setConnotationsOfSynonymsWithSetOfAlreadySet:wordsWithConnotations onOperationQueue:self.synonymQueue];
         }
     }
     
@@ -205,6 +226,7 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
 // in the database. Works on NSOperationQueue so all the branch recursion doesn't create an infinite
 // amount of threads.
 - (void)setConnotationsOfSynonymsWithSetOfAlreadySet: (NSMutableSet *)alreadySet onOperationQueue: (NSOperationQueue *)queue {
+    self.isFindingSynonyms = YES;
     // Initialize our block operation, must wait until finished (no concurrency!)
     NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^ {
         
@@ -213,6 +235,9 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
             if ([obj isMemberOfClass:[Word class]]) {
                 Word *word = (Word *)obj;
                 // Don't do anything if we already have a connotation or it has already been set
+                if (word.connotation) {
+                    return ([word.connotation isEqualToString:@"good"] || [word.connotation isEqualToString:@"bad"]);
+                }
                 return (word.connotation == nil);
             }
             return NO;
@@ -240,7 +265,9 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
             }
         } else {
             // We're done here
+            
         }
+        self.isFindingSynonyms = NO;
     }];
     [queue addOperations:@[operation] waitUntilFinished:NO];
 }
@@ -292,16 +319,6 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     }
     
     return dictionary;
-}
-
-+ (NSURLSession *)urlSession {
-    static NSURLSession *session;
-    
-    if (!session) {
-        session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-    }
-    
-    return session;
 }
 
 @end

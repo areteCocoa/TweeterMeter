@@ -23,6 +23,8 @@
 - (void)tweetsDidFinishParsing;
 - (void)tweetsDidSave;
 
+- (void)noResponseData;
+
 @end
 
 @interface TMTerm : NSObject
@@ -36,7 +38,8 @@
 @property (strong, nonatomic) NSMutableDictionary *popularTags;
 @property (strong, nonatomic) NSMutableDictionary *popularUsers;
 
-@property (nonatomic, retain, readonly) NSString *state; // Is it doing anything of interest?
+@property (nonatomic) BOOL isFetchingTweets;
+@property (nonatomic) BOOL shouldFetchTweets;
 
 @property id <TMTermDelegate> delegate;
 

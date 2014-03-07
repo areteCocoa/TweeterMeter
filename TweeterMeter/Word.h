@@ -27,6 +27,9 @@
 @property (nonatomic, retain) NSSet * synonyms;
 @property (nonatomic, retain) NSSet * frequencyObject;
 
+@property (nonatomic) NSInteger stringLength;
+@property (nonatomic) BOOL isFindingSynonyms;
+
 - (id)initWordWithName: (NSString *)name inContext: (NSManagedObjectContext *)context;
 
 + (NSString *)getCorrectWordFromString: (NSString *)string;

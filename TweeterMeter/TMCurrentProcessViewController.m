@@ -18,6 +18,10 @@
 @property (strong, nonatomic) IBOutlet UILabel *afterLabel;
 @property (strong, nonatomic) IBOutlet UIProgressView *progressBarView;
 
+@property (nonatomic) int beforeValue;
+@property (nonatomic) int afterValue;
+@property (nonatomic) int amountOfTweets;
+
 - (void)showLabelView;
 
 @end
@@ -45,6 +49,8 @@
 	// Do any additional setup after loading the view.
     
     self.view.backgroundColor = [UIColor colorWithWhite:1 alpha:.5];
+    self.textView.backgroundColor = self.view.backgroundColor;
+    self.progressView.backgroundColor = self.view.backgroundColor;
     
     self.beforeLabel.text = @"";
     self.afterLabel.text = @"";
@@ -68,10 +74,16 @@
 - (void)setBeforeValue:(int)beforeValue withAfterValue:(int)afterValue {
     self.beforeLabel.text = [NSString stringWithFormat:@"%i", beforeValue];
     self.afterLabel.text = [NSString stringWithFormat:@"%i", afterValue];
+    
+    self.beforeValue = beforeValue;
+    self.afterValue = afterValue;
+    self.amountOfTweets = afterValue - beforeValue;
 }
 
 - (void)setProgressBarProgress:(float)progress {
     self.progressBarView.progress = progress;
+    
+    self.beforeLabel.text = [NSString stringWithFormat:@"%.0f", self.beforeValue + progress*self.amountOfTweets];
 }
 
 - (void)showLabelViewWithText: (NSString *)text {

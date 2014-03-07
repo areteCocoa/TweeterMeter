@@ -138,8 +138,19 @@
     if ([object isMemberOfClass:[Term class]]) {
         Term *managedTerm = (Term *)object;
         
-        self.detailViewController.term = [[TMTerm alloc] initTermWithManagedTerm:managedTerm withContext:self.managedObjectContext];
-        [self.detailViewController.term beginFetchingTweetsOnOperationQueue:self.operationQueue];
+        [self.operationQueue cancelAllOperations];
+        self.detailViewController.term.shouldFetchTweets = NO;
+        
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            
+            while (self.detailViewController.term.isFetchingTweets);
+            
+            // Update UI
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.detailViewController.term = [[TMTerm alloc] initTermWithManagedTerm:managedTerm withContext:self.managedObjectContext];
+                [self.detailViewController.term beginFetchingTweetsOnOperationQueue:self.operationQueue];
+            });
+        });
     }
 }
 
@@ -246,6 +257,7 @@
 {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [[object valueForKey:@"name"] description];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"%i", [[object valueForKey:@"tweets"] count]];
 }
 
 - (NSOperationQueue *)operationQueue {
