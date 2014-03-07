@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) NSNumber * displayArticles;
 @property (nonatomic, retain) NSNumber * displayConjunctions;
+@property (nonatomic, retain) NSNumber * displayDeterminers;
 @property (nonatomic, retain) NSNumber * displayInvalidWords;
 @property (nonatomic, retain) NSNumber * displayPrepositions;
 @property (nonatomic, retain) NSNumber * displayTerm;

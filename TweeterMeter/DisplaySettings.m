@@ -14,6 +14,7 @@
 
 @dynamic displayArticles;
 @dynamic displayConjunctions;
+@dynamic displayDeterminers;
 @dynamic displayInvalidWords;
 @dynamic displayPrepositions;
 @dynamic displayTerm;

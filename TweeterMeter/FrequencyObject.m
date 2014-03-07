@@ -16,16 +16,6 @@
 @dynamic name;
 @dynamic parentWord;
 
-- (void)awakeFromInsert {
-    [super awakeFromInsert];
-    if (!self.parentWord) {
-        // Initialize a new word
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Word" inManagedObjectContext:[self managedObjectContext]];
-        Word *word = [[Word alloc] initWithEntity:entity insertIntoManagedObjectContext:[self managedObjectContext]];
-        word.name = self.name;
-    }
-}
-
 - (void)addOneToFrequency {
     float oldFrequency = [self.frequency floatValue];
     float newFrequency = oldFrequency + 1;

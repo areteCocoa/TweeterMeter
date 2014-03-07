@@ -13,7 +13,11 @@
 #import "Term.h"
 
 @interface TMMasterViewController ()
+
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+
+@property (strong, nonatomic) NSOperationQueue *operationQueue;
+
 @end
 
 @implementation TMMasterViewController
@@ -47,32 +51,32 @@
     NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
     NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
     NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    Term *newManagedTerm = (Term *)newManagedObject;
     
     // If appropriate, configure the new managed object.
     // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
     [newManagedObject setValue:[NSDate date] forKey:@"creationTime"];
-    [newManagedObject setValue:@"Term" forKey:@"name"];
     
-    UIAlertView *nameAlertView = [[UIAlertView alloc] initWithTitle:@"Term Needed" message:@"Enter the term to be searched" delegate:Nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
-    nameAlertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    nameAlertView.tapBlock = ^(UIAlertView *alertView, NSInteger buttonIndex) {
-        if (buttonIndex == 0) {
-            // Delete object from table
-        } else if (buttonIndex == 1) {
-            NSString *entry = [alertView textFieldAtIndex:0].text;
-            [newManagedObject setValue:entry forKey:@"name"];
-            
-            // Save the context.
-            NSError *error = nil;
-            if (![context save:&error]) {
-                // Replace this implementation with code to handle the error appropriately.
-                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-                abort();
-            }
-        }
-    };
-    [nameAlertView show];
+    TMCreateTermViewController *createViewController = [[TMCreateTermViewController alloc] initWithTerm:newManagedTerm];
+    createViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    createViewController.delegate = self;
+    [self presentViewController:createViewController animated:YES completion:nil];
+}
+
+- (void)createViewControllerWillDismiss {
+    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    
+    NSError *error = nil;
+    if (![context save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        // abort();
+    }
+    NSUInteger indexes[] = {0, 0};
+    NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indexes length:2];
+    [self.masterTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone]; // Select new item
+    [self tableView:self.masterTableView didSelectRowAtIndexPath:indexPath];
 }
 
 #pragma mark - Table View
@@ -105,14 +109,18 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+        Term *term = (Term *)[self.fetchedResultsController objectAtIndexPath:indexPath];
+        if (term.objectID == self.detailViewController.term.objectID) {
+            [self.operationQueue cancelAllOperations];
+        }
+        [context deleteObject:term];
         
         NSError *error = nil;
         if (![context save:&error]) {
              // Replace this implementation with code to handle the error appropriately.
              // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development. 
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
+            // abort();
         }
     }   
 }
@@ -131,6 +139,7 @@
         Term *managedTerm = (Term *)object;
         
         self.detailViewController.term = [[TMTerm alloc] initTermWithManagedTerm:managedTerm withContext:self.managedObjectContext];
+        [self.detailViewController.term beginFetchingTweetsOnOperationQueue:self.operationQueue];
     }
 }
 
@@ -237,6 +246,13 @@
 {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [[object valueForKey:@"name"] description];
+}
+
+- (NSOperationQueue *)operationQueue {
+    if (!_operationQueue) {
+        _operationQueue = [[NSOperationQueue alloc] init];
+    }
+    return _operationQueue;
 }
 
 @end

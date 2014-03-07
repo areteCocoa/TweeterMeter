@@ -11,10 +11,12 @@
 @class TMDetailViewController;
 
 #import <CoreData/CoreData.h>
+#import "TMCreateTermViewController.h"
 
-@interface TMMasterViewController : UITableViewController <NSFetchedResultsControllerDelegate>
+@interface TMMasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, TMCreateTermViewControllerDelegate>
 
 @property (strong, nonatomic) TMDetailViewController *detailViewController;
+@property (strong, nonatomic) IBOutlet UITableView *masterTableView;
 
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;

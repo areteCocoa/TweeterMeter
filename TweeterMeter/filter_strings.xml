@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <filter name="web_characters">
-    <string text="http://"></string>
-    <string text="www."></string>
-    <string text=".org"></string>
-    <string text=".com"></string>
+    <string text="http"></string>
+    <string text="www"></string>
+    <string text="org"></string>
+    <string text="com"></string>
 </filter>
 <filter name="invalid_characters">
     <string text="\"></string>

@@ -13,9 +13,13 @@
 @property (strong, nonatomic) TMChartViewController *chartViewController;
 @property (strong, nonatomic) TMFrequencyViewController *frequencyViewController;
 @property (strong, nonatomic) TMDataTimelineViewController *dataViewController;
+@property (strong, nonatomic) TMCurrentProcessViewController *currentProcessViewController;
 @property (strong, nonatomic) NSArray *viewControllers;
 
 @property (strong, nonatomic) UIPopoverController *masterPopoverController;
+
+@property (strong, nonatomic) UIView *overlayView; // Displayed when no term is selected
+
 - (void)configureView;
 
 @end
@@ -45,6 +49,8 @@
 
 - (void)configureView
 {
+    self.view.backgroundColor = [(TMAppDelegate *)[[UIApplication sharedApplication] delegate] backgroundColor];
+    
     // Update the user interface for the detail item.
     if (!self.chartViewController || !self.frequencyViewController || !self.dataViewController) {
         self.chartViewController = [[TMChartViewController alloc] initWithTerm: self.term];
@@ -60,7 +66,10 @@
     }
     
     if (self.term) {
-        self.navigationItem.title = self.term.name;
+        self.navigationItem.title = [NSString stringWithFormat:@"%@ - %@", self.term.name, [NSNumber numberWithInteger:[self.term numberOfTweets]]];
+        [self.overlayView setHidden:YES];
+    } else {
+        self.navigationItem.title = @"TweeterMeter";
     }
     
     [self updateSubviews];
@@ -75,13 +84,35 @@
     //[self.splitViewController.view setNeedsLayout];
     [self configureView];
     
-    self.pageViewController.view.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+    // Progress View Controller
+    CGFloat navigationHeight = self.navigationController.navigationBar.frame.size.height;
+    CGFloat height = 50;
+    self.currentProcessViewController = [[TMCurrentProcessViewController alloc] init];
+    self.currentProcessViewController.view.frame = CGRectMake(0, navigationHeight + 10, self.view.frame.size.width, height);
+    self.currentProcessViewController.view.backgroundColor = [UIColor colorWithWhite:1 alpha:.5];
+    [self addChildViewController: self.currentProcessViewController];
+    [self.view addSubview: self.currentProcessViewController.view];
+    [self.currentProcessViewController didMoveToParentViewController:self];
+    
+    [self.currentProcessViewController.view setNeedsDisplay];
+    
+    self.pageViewController.view.frame = CGRectMake(0, self.currentProcessViewController.view.frame.size.height+self.currentProcessViewController.view.frame.origin.x, self.view.frame.size.width, self.view.frame.size.height-height);
     
     [self addChildViewController:self.pageViewController];
     [self.view addSubview:self.pageViewController.view];
     [self.pageViewController didMoveToParentViewController:self];
     
     [self.pageViewController.view setNeedsDisplay];
+    
+    if (!self.term) {
+        if (!self.overlayView) {
+            self.overlayView = [[UIView alloc] initWithFrame:self.view.frame];
+            self.overlayView.backgroundColor = self.view.backgroundColor;
+            [self.view addSubview:self.overlayView];
+            [self.view bringSubviewToFront:self.overlayView];
+        }
+        [self.overlayView setHidden:NO];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -94,17 +125,56 @@
     [self.chartViewController updateView];
     [self.frequencyViewController updateView];
     [self.dataViewController updateView];
+    
+    if (self.term) {
+        self.navigationItem.title = [NSString stringWithFormat:@"%@ - %@", self.term.name, [NSNumber numberWithInteger:[self.term numberOfTweets]]];
+    }
 }
 
 #pragma mark - TMTermDelegate
 
-- (void)tweetsDidUpdate {
-    
+- (void)attemptingToConnectToTwitter {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController showLabelViewWithText:@"Attempting to connect to Twitter..."] ;
+    });
+}
+
+- (void)didConnectToTwitter {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController showLabelViewWithText:@"Successfully Connected to Twitter!"];
+    });
+}
+
+- (void)executedFetchRequest {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController showLabelViewWithText:@"Executing fetch request..."];
+    });
+}
+
+- (void)startedLoadingTweetsFromRequest:(int)amountOfTweets {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController showLabelViewWithText:[NSString stringWithFormat:@"Loading %i Tweets from fetch request...", amountOfTweets]];
+        [self.currentProcessViewController setBeforeValue:[self.term numberOfTweets] withAfterValue:[self.term numberOfTweets] + amountOfTweets];
+    });
+}
+
+- (void)tweetsHaveLoadedPercent: (float)percent {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController setProgressBarProgress:percent];
+        [self.currentProcessViewController showProgressView];
+    });
+}
+
+- (void)tweetsDidFinishParsing {
+    dispatch_async(dispatch_get_main_queue(), ^ {
+        [self.currentProcessViewController showLabelViewWithText:@"Tweets finished being analyzed..."];
+    });
 }
 
 - (void)tweetsDidSave {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass data to the VCs
+        [self.currentProcessViewController showLabelViewWithText:@"Tweets successfully saved to database!"];
         [self updateSubviews];
     });
 }
@@ -129,7 +199,6 @@
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
     NSUInteger index = [self indexOfViewController:viewController];
-    
     
     if (index == NSNotFound) {
         return nil;
@@ -156,7 +225,7 @@
     } else if (index == 1) {
         return self.frequencyViewController;
     } else if (index == 2) {
-        return self.dataViewController;
+        // return self.dataViewController;
     }
     return nil;
 }
@@ -173,7 +242,7 @@
 }
 
 - (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
-    return 3;
+    return 2;
 }
 
 - (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {

@@ -10,17 +10,20 @@
 #import "Tweet.h"
 #import <Social/Social.h>
 #import <Accounts/Accounts.h>
+#import <objc/objc-sync.h>
 
 @interface TMTerm()
 
 @property (strong, nonatomic) Term *managedTerm;
 @property (strong, nonatomic) NSManagedObjectContext *context;
-
 @property (strong, nonatomic) NSEntityDescription *entity;
 @property (strong, nonatomic) NSPersistentStoreCoordinator *store;
 
-@property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) NSOperationQueue *queue;
+@property (strong, nonatomic, readonly) NSInvocationOperation *fetchTweetsOperation;
+
+@property (strong, nonatomic) NSString *termState;
+@property (nonatomic) BOOL hasReachedBottomOfTweets;
 
 @end
 
@@ -34,13 +37,12 @@
     
     self.name = managedTerm.name;
     
-    // SETTINGS AND OPTIONS
-    self.displayInvalidWords = NO; // Should display words marked as invalid?
-    self.topStackRefresh = 60; // Time (minutes) that tweets should be retreived from top (opposed to bottom)
-    
     self.popularWords = [NSMutableDictionary dictionary];
     self.popularTags =  [NSMutableDictionary dictionary];
     self.popularUsers = [NSMutableDictionary dictionary];
+    
+    self.queue = [[NSOperationQueue alloc] init];
+    self.hasReachedBottomOfTweets = NO;
     
     self.context = [[NSManagedObjectContext alloc] init];
     [self.context setPersistentStoreCoordinator:context.persistentStoreCoordinator];
@@ -59,54 +61,77 @@
         NSLog(@"Error: %@", error);
     }
     
+    // SETTINGS AND OPTIONS
+    self.topStackRefresh = 360; // Time (minutes) that tweets should be retreived from top (opposed to bottom)
+    DisplaySettings *settings = [NSEntityDescription insertNewObjectForEntityForName:@"DisplaySettings" inManagedObjectContext:self.context];
+    
+    self.managedTerm.displaySettings = settings;
+    
     for (FrequencyWord* word in managedTerm.frequencyWords) {
-        if (!self.displayInvalidWords) {
-            if (![word.parentWord.isValid isEqualToNumber:@0]) {
-                [self.popularWords setObject:word.frequency forKey:word.name];
-            }
-        } else {
+        if ([self shouldCountWord:word.parentWord]) {
             [self.popularWords setObject:word.frequency forKey:word.name];
         }
     }
     
     for (FrequencyTag* tag in managedTerm.frequencyTags) {
-        if (!self.displayInvalidWords) {
-            if (![tag.parentWord.isValid isEqualToNumber:@0]) {
-                [self.popularTags setObject:tag.frequency forKey:tag.name];
-            }
-        } else {
+        if ([self shouldCountWord:tag.parentWord]) {
             [self.popularTags setObject:tag.frequency forKey:tag.name];
         }
     }
     
     for (FrequencyUser* user in managedTerm.frequencyUsers) {
-        if (!self.displayInvalidWords) {
-            if (![user.parentWord.isValid isEqualToNumber:@0]) {
-                [self.popularUsers setObject:user.frequency forKey:user.name];
-            }
-        } else {
+        if ([self shouldCountWord:user.parentWord]) {
             [self.popularUsers setObject:user.frequency forKey:user.name];
         }
     }
     
     NSLog(@"Tweets loaded: %lu", (unsigned long)self.managedTerm.tweets.count);
     
-    [self fetchNumberOfTweets:100 withContext:self.context];
-    [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(fetchMaxTweets) userInfo:nil repeats:YES];
-    
     return self;
 }
 
-- (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string {
-    // Get tweets that only match the string and are longer than the minimumStringCount
-    NSSet *filteredTweets = [self.managedTerm.tweets objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+- (NSArray *)newestTweets:(NSInteger)numberOfTweets {
+    NSSet *tweets = [self.managedTerm.tweets copy];
+    
+    NSMutableArray *tweetsArray = [[self sortTweetsByDate:tweets] mutableCopy];
+    while (tweetsArray.count > numberOfTweets) {
+        [tweetsArray removeLastObject];
+    }
+    
+    return tweetsArray;
+}
+
+- (NSInteger)numberOfTweets {
+    return self.managedTerm.tweets.count;
+}
+
+- (NSInteger)numberOfTweetsWithConnotation:(NSString *)connotation {
+    return [self tweetsWithConnotation:connotation].count;
+}
+
+// Returns a set of tweet objects in an unsorted set
+- (NSArray *)tweetsWithConnotation:(NSString *)connotation {
+    NSSet *set = [self.managedTerm.tweets objectsPassingTest:^BOOL(id obj, BOOL* test) {
         Tweet *tweet = (Tweet *)obj;
-        BOOL tweetContainsString = ([tweet.text rangeOfString:string].location != NSNotFound);
+        return [tweet.connotation isEqualToString:connotation];
+    }];
+    
+    NSArray *tweets = [self sortTweetsByDate:set];
+    
+    return tweets;
+}
+
+- (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string {
+    // Get tweets that only match the string
+    NSSet *tweetsCopy = [self.managedTerm.tweets copy];
+    NSSet *filteredTweets = [tweetsCopy objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+        Tweet *tweet = (Tweet *)obj;
+        BOOL tweetContainsString = ([[tweet.text lowercaseString] rangeOfString:string].location != NSNotFound);
         return tweetContainsString;
     }];
     
     // Sort by date
-    NSMutableArray *array = [[filteredTweets sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]] mutableCopy];
+    NSMutableArray *array = [[self sortTweetsByDate:filteredTweets] mutableCopy];
     while (array.count > numberOfTweets) {
         [array removeLastObject];
     }
@@ -114,9 +139,42 @@
     return array;
 }
 
-- (void)countString: (NSString *)word {
-    if ([self shouldAddString:word]) {
-        char firstCharacter = [word characterAtIndex:0];
+- (NSArray *)sortTweetsByDate: (NSSet *)tweets {
+    NSArray *tweetsArray = [[tweets allObjects] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        Tweet *tweet1 = (Tweet *)obj1;
+        Tweet *tweet2 = (Tweet *)obj2;
+        if ([[tweet1.date laterDate:tweet2.date] isEqualToDate:tweet1.date]) {
+            return (NSComparisonResult)NSOrderedDescending;
+        } else {
+            return (NSComparisonResult)NSOrderedAscending;
+        }
+        
+        return (NSComparisonResult)NSOrderedSame;
+    }];
+    
+    return tweetsArray;
+}
+
+- (void)beginFetchingTweetsOnOperationQueue:(NSOperationQueue *)queue {
+    if (queue) {
+        self.queue = queue;
+    }
+    [self fetchMaxTweetsOnQueue];
+}
+
+- (NSInvocationOperation *)fetchTweetsOperation {
+    NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(fetchMaxTweets) object:nil];
+    
+    return operation;
+}
+
+- (void)fetchMaxTweets {
+    [self fetchNumberOfTweets:100 withContext:self.context];
+}
+
+- (void)countWord: (Word *)word {
+    if ([self shouldCountWord:word]) {
+        char firstCharacter = [word.name characterAtIndex:0];
         NSMutableDictionary *dictionary;
         if (firstCharacter == '#') {
             dictionary = self.popularTags;
@@ -126,44 +184,51 @@
             dictionary = self.popularWords;
         }
         
-        NSNumber *oldValue = [dictionary objectForKey:word];
+        NSNumber *oldValue = [dictionary objectForKey:word.name];
         if (!oldValue) {
-            [dictionary setObject:@1 forKey:word];
+            [dictionary setObject:@1 forKey:word.name];
         } else {
-            [dictionary setObject:@([oldValue intValue] + 1) forKey:word];
+            [dictionary setObject:@([oldValue intValue] + 1) forKey:word.name];
         }
     }
 }
 
-- (BOOL)shouldAddString: (NSString *)string {
+- (BOOL)shouldCountWord: (Word *)word {
+    DisplaySettings *settings = self.managedTerm.displaySettings;
+    
     // Reject strings less than length of minimumStringCount
-    if ([self.managedTerm.displaySettings.minimumStringCount integerValue] > string.length) {
+    if ([settings.minimumStringCount intValue] > word.name.length) {
         return NO;
     }
     
     // Reject articles if toggled
-    if ([self.managedTerm.displaySettings.displayArticles isEqualToNumber:@0]) {
-        //
+    if ([settings.displayArticles isEqualToNumber:@0] && [word.type isEqualToString:@"Article"]) {
+        return NO;
     }
     
     // Reject conjunctions if toggled
-    if ([self.managedTerm.displaySettings.displayConjunctions isEqualToNumber:@0]) {
-        //
+    if ([settings.displayConjunctions isEqualToNumber:@0] && [word.type isEqualToString:@"Conjunction"]) {
+        return NO;
+    }
+    
+    // Reject determiners if toggled
+    if ([settings.displayDeterminers isEqualToNumber:@0] && [word.type isEqualToString:@"Determiner"]) {
+        return NO;
     }
     
     // Reject invalid words if toggled
-    if ([self.managedTerm.displaySettings.displayInvalidWords isEqualToNumber:@0]) {
-        //
+    if ([settings.displayInvalidWords isEqualToNumber:@0] && [word.isValid isEqualToNumber:@0]) {
+        return NO;
     }
     
     // Reject prepositions if toggled
-    if ([self.managedTerm.displaySettings.displayPrepositions isEqualToNumber:@0]) {
+    if ([settings.displayPrepositions isEqualToNumber:@0] && [word.type isEqualToString:@"Preposition"]) {
         //
     }
     
     // Reject term words if toggled
-    if ([self.managedTerm.displaySettings.displayTerm isEqualToNumber:@0]) {
-        //
+    if ([settings.displayTerm isEqualToNumber:@0] && [self.managedTerm.name rangeOfString:word.name].location != NSNotFound) {
+        return NO;
     }
     
     return YES;
@@ -171,12 +236,15 @@
 
 #pragma mark Twitter Methods
 
-- (void)fetchMaxTweets {
-    [self fetchNumberOfTweets:100 withContext:self.context];
+- (void)fetchMaxTweetsOnQueue {
+    [self.queue addOperations:@[self.fetchTweetsOperation] waitUntilFinished:YES];
 }
 
 - (void)fetchNumberOfTweets:(int)number withContext:(NSManagedObjectContext *)context {
+    [self.delegate attemptingToConnectToTwitter];
+    
     ACAccountStore *store = [[ACAccountStore alloc] init];
+    
     if ([SLComposeViewController
          isAvailableForServiceType:SLServiceTypeTwitter]) {
         
@@ -186,8 +254,8 @@
         [store requestAccessToAccountsWithType:twitterAccountType options:NULL
                                     completion:^(BOOL granted, NSError *error) {
              if (granted) {
-                 // Create a request
-                 // See what range of tweets we should be getting
+                 [self.delegate didConnectToTwitter];
+                 // Create request with params
                  NSMutableDictionary *params = [@{@"q" : _name,
                                                  @"result_type" : @"recent",
                                                  @"count" : [NSString stringWithFormat:@"%i", number]} mutableCopy];
@@ -195,8 +263,10 @@
                      NSDate *nextUpdate = [self.managedTerm.maxDate dateByAddingTimeInterval:60*self.topStackRefresh];
                      if ([nextUpdate earlierDate:[NSDate date]] == nextUpdate) {
                          [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.maxID] forKey:@"since_id"];
-                     } else {
+                     } else if (!self.hasReachedBottomOfTweets) {
                          [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.minID] forKey:@"max_id"];
+                     } else {
+                         [params setObject:[NSString stringWithFormat:@"%@", self.managedTerm.maxID] forKey:@"since_id"];
                      }
 
                  }
@@ -212,29 +282,37 @@
                  
                  //  Step 3:  Execute the request
                  [request performRequestWithHandler:
-                  ^(NSData *responseData,
-                    NSHTTPURLResponse *urlResponse,
-                    NSError *error) {
-                      
+                  ^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+                      [self.delegate executedFetchRequest];
                       if (responseData) {
                           if (urlResponse.statusCode >= 200 && urlResponse.statusCode < 300) {
                               NSError *jsonError;
-                              NSDictionary *timelineData =
-                              [NSJSONSerialization
-                               JSONObjectWithData:responseData
-                               options:NSJSONReadingAllowFragments error:&jsonError];
+                              NSDictionary *timelineData = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingAllowFragments error:&jsonError];
                               if (timelineData) {
                                   // create tweets from data
                                   id statuses = [timelineData valueForKey:@"statuses"];
+                                  NSLog(@"Attempted to fetch %@ tweets. %@ received.", [NSNumber numberWithInt:number], [NSNumber numberWithFloat:[statuses allObjects].count]);
                                   if ([statuses isKindOfClass:[NSArray class]]) {
+                                      NSArray *statusesArray = (NSArray *)statuses;
+                                      float count = 0.0;
+                                      float total = statusesArray.count;
+                                      [self.delegate startedLoadingTweetsFromRequest:total];
+                                      
                                       for (NSDictionary *dictionary in statuses) {
                                           [self addTweet:dictionary inContext:context];
+                                          count++;
+                                          [self.delegate tweetsHaveLoadedPercent:count/total];
                                       }
-                                      [self.delegate tweetsDidUpdate];
+                                      [self.delegate tweetsDidFinishParsing];
                                       if ([self saveContext:context]) {
                                           [self.delegate tweetsDidSave];
                                       }
-                                      NSLog(@"Attempted to fetch %@ tweets. %@ received.", [NSNumber numberWithInt:number], [NSNumber numberWithFloat:[statuses allObjects].count]);
+                                      
+                                      BOOL verbosePrintTweets = NO;
+                                      if (verbosePrintTweets) {
+                                          NSLog(@"%@", statuses);
+                                      }
+                                      [self fetchMaxTweetsOnQueue];
                                   }
                               }
                               else {
@@ -259,6 +337,8 @@
 }
 
 - (void)addTweet: (NSDictionary *)rawTweet inContext: (NSManagedObjectContext *)context {
+    [context lock];
+    
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
     Tweet *tweet;
     
@@ -278,7 +358,8 @@
         }
     } else {
         tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        tweet.user = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
+        tweet.userName = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
+        tweet.userScreenName = [[rawTweet valueForKey:@"user"] valueForKey:@"screen_name"];
         tweet.text = [rawTweet valueForKey:@"text"];
         tweet.tweetID = [rawTweet valueForKey:@"id"];
         
@@ -297,6 +378,7 @@
     }
     
     // [self.delegate tweetsDidUpdate];
+    [context unlock];
 }
 
 // Goes through tweet looking for certain words
@@ -312,31 +394,55 @@
     NSString *wordString;
     FrequencyObject *frequencyObject;
     
+    int good = 0, bad = 0;
     for (NSUInteger index = 0; index < words.count; index++) {
-        wordString = [words[index] lowercaseString];
-        if (wordString.length != 0) {
+        
+        // Trim word string
+        wordString = [words[index] lowercaseString]; //lowercase
+        if (wordString.length > 0) {
+            wordString = [Word getCorrectWordFromString:wordString];
+        }
+        
+        if (wordString.length > 0) {
             frequencyObject = [self getFrequencyObjectWithName:wordString];
             [frequencyObject addOneToFrequency];
             
-            [self countString:frequencyObject.name];
+            [self countWord:frequencyObject.parentWord];
+            if (frequencyObject.parentWord.connotation != nil && ![frequencyObject.parentWord.connotation isEqualToString:@""] && [self.managedTerm.name rangeOfString:frequencyObject.parentWord.name].location == NSNotFound) {
+                if ([frequencyObject.parentWord.connotation isEqualToString:@"good"]) {
+                    good++;
+                }else if ([frequencyObject.parentWord.connotation isEqualToString:@"bad"]) {
+                    bad++;
+                }
+            }
         }
+    }
+    if (good > bad) {
+        tweet.connotation = @"good";
+    } else if (bad > good) {
+        tweet.connotation = @"bad";
+    } else if (good == 0 && bad == 0){
+        tweet.connotation = @"none";
+    } else {
+        // default
+        tweet.connotation = @"good";
     }
     
     // Set managed term tracking of our data's position relative to other data
-    if (!self.managedTerm.maxDate || !self.managedTerm.minDate || self.managedTerm.minID == 0|| self.managedTerm.maxID == 0) {
+    if (!self.managedTerm.maxDate || !self.managedTerm.minDate || [self.managedTerm.minID isEqualToNumber:@0]|| [self.managedTerm.maxID isEqualToNumber:@0]) {
         if (!self.managedTerm.maxDate) self.managedTerm.maxDate = tweet.date;
         if (!self.managedTerm.minDate) self.managedTerm.minDate = tweet.date;
-        if (self.managedTerm.minID == 0) self.managedTerm.minID = tweet.tweetID;
-        if (self.managedTerm.maxID == 0) self.managedTerm.maxID = tweet.tweetID;
+        if ([self.managedTerm.minID isEqualToNumber:@0]) self.managedTerm.minID = tweet.tweetID;
+        if ([self.managedTerm.maxID isEqualToNumber:@0]) self.managedTerm.maxID = tweet.tweetID;
     } else {
-        if ([self.managedTerm.maxDate laterDate:tweet.date] == tweet.date) {
+        if ([[self.managedTerm.maxDate laterDate:tweet.date] isEqualToDate:tweet.date]) {
             self.managedTerm.maxDate = tweet.date;
-        } else if ([self.managedTerm.minDate earlierDate:tweet.date] == tweet.date) {
+        } else if ([[self.managedTerm.minDate earlierDate:tweet.date] isEqualToDate:tweet.date]) {
             self.managedTerm.minDate = tweet.date;
         }
-        if (self.managedTerm.maxID < tweet.tweetID) {
+        if ([self.managedTerm.maxID compare:tweet.tweetID] == (NSComparisonResult)NSOrderedAscending) {
             self.managedTerm.maxID = tweet.tweetID;
-        } else if (self.managedTerm.minID > tweet.tweetID) {
+        } else if ([self.managedTerm.minID compare:tweet.tweetID] == (NSComparisonResult)NSOrderedDescending) {
             self.managedTerm.minID = tweet.tweetID;
         }
     }
@@ -366,7 +472,7 @@
             
             tag.parentWord = parentWord;
             
-            [self saveContext:self.context];
+            // [self saveContext:self.context];
         }
         
         return tag;
@@ -388,7 +494,7 @@
             
             user.parentWord = parentWord;
             
-            [self saveContext:self.context];
+            // [self saveContext:self.context];
         }
         
         return user;
@@ -409,7 +515,7 @@
             word.term = term;
             word.parentWord = parentWord;
             
-            [self saveContext:self.context];
+            // [self saveContext:self.context];
         }
         
         return word;
@@ -439,6 +545,14 @@
         NSLog(@"context nil");
     }
     return YES;
+}
+
+- (NSString *)state {
+    return self.termState;
+}
+
+- (NSManagedObjectID *)objectID {
+    return self.managedTerm.objectID;
 }
  
 @end

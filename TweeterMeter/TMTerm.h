@@ -15,7 +15,12 @@
 
 @protocol TMTermDelegate <NSObject>
 
-- (void)tweetsDidUpdate;
+- (void)attemptingToConnectToTwitter;
+- (void)didConnectToTwitter;
+- (void)executedFetchRequest;
+- (void)startedLoadingTweetsFromRequest: (int)amountOfTweets;
+- (void)tweetsHaveLoadedPercent: (float)percent; // from 0 to 1 how many tweets have loaded
+- (void)tweetsDidFinishParsing;
 - (void)tweetsDidSave;
 
 @end
@@ -23,17 +28,26 @@
 @interface TMTerm : NSObject
 
 @property (strong, nonatomic) NSString *name;
+@property (strong, nonatomic, readonly) NSManagedObjectID *objectID;
 
-@property (nonatomic) BOOL displayInvalidWords;
 @property (nonatomic) int topStackRefresh; // How long before the top section of the tweet stack should be updated, minutes
 
 @property (strong, nonatomic) NSMutableDictionary *popularWords;
 @property (strong, nonatomic) NSMutableDictionary *popularTags;
 @property (strong, nonatomic) NSMutableDictionary *popularUsers;
 
+@property (nonatomic, retain, readonly) NSString *state; // Is it doing anything of interest?
+
 @property id <TMTermDelegate> delegate;
 
 - (id)initTermWithManagedTerm: (Term *)managedTerm withContext:(NSManagedObjectContext *)context;
+
+- (NSInteger)numberOfTweets;
+- (NSInteger)numberOfTweetsWithConnotation: (NSString *)connotation;
+- (NSArray *)tweetsWithConnotation: (NSString *)connotation;
 - (NSArray *)tweetsWithNumber: (NSInteger)numberOfTweets containingString: (NSString *)string;
+- (NSArray *)newestTweets: (NSInteger)count;
+
+- (void)beginFetchingTweetsOnOperationQueue: (NSOperationQueue *)queue;
 
 @end

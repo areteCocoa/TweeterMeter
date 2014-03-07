@@ -10,6 +10,7 @@
 
 #import "TMTerm.h"
 #import "Tweet.h"
+#import "TMTweetCell.h"
 
 @interface TMFrequencyViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 

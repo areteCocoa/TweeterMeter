@@ -8,6 +8,12 @@
 
 #import "TMInvalidStringLoader.h"
 
+@interface TMInvalidStringLoader()
+
+@property (nonatomic, retain) NSMutableSet *loadingData;
+
+@end
+
 @implementation TMInvalidStringLoader
 
 @synthesize parser = _parser;

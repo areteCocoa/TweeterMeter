@@ -30,7 +30,7 @@
     UIPageControl *pageControl = [UIPageControl appearance];
     pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
     pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
-    pageControl.backgroundColor = [self.backgroundColor colorWithAlphaComponent:.5];
+    pageControl.backgroundColor = [self.backgroundColor colorWithAlphaComponent:0];
     
     return YES;
 }
@@ -75,10 +75,6 @@
             abort();
         } 
     }
-}
-
-- (UIColor *)backgroundColor {
-    return [UIColor colorWithRed:0 green:.7647 blue:1 alpha:1];
 }
 
 #pragma mark - Core Data stack
@@ -152,6 +148,14 @@
     }    
     
     return _persistentStoreCoordinator;
+}
+
+- (UIColor *)backgroundColor {
+    return [UIColor colorWithRed:0.4039 green:0.6706 blue:0.8078 alpha:1];
+}
+
+- (UIColor *)tableBackgroundColor {
+    return [UIColor colorWithWhite:1 alpha:.5];
 }
 
 #pragma mark - Application's Documents directory

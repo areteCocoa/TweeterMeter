@@ -10,6 +10,7 @@
 #import <Social/Social.h>
 #import <Accounts/Accounts.h>
 
+#import "TMCurrentProcessViewController.h"
 #import "TMChartViewController.h"
 #import "TMFrequencyViewController.h"
 #import "TMDataTimelineViewController.h"

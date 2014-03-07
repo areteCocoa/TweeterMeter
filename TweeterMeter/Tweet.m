@@ -11,8 +11,10 @@
 
 @implementation Tweet
 
+@dynamic connotation;
 @dynamic text;
-@dynamic user;
+@dynamic userName;
+@dynamic userScreenName;
 @dynamic term;
 @dynamic tweetID;
 @dynamic date;

@@ -642,7 +642,7 @@ static CGPathRef CGPathCreateArc(CGPoint center, CGFloat radius, CGFloat startAn
         [textLayer setShadowRadius:2.0f];
     }
     // CGSize size = [@"0" sizeWithFont:self.labelFont];
-    CGSize size = [@"0" sizeWithAttributes:[NSDictionary dictionaryWithObjects:@[self.labelFont] forKeys:@[@"font"]]];
+    CGSize size = [@"00" sizeWithAttributes:[NSDictionary dictionaryWithObjects:@[self.labelFont] forKeys:@[NSFontAttributeName]]];
     [CATransaction setDisableActions:YES];
     [textLayer setFrame:CGRectMake(0, 0, size.width, size.height)];
     [textLayer setPosition:CGPointMake(_pieCenter.x + (_labelRadius * cos(0)), _pieCenter.y + (_labelRadius * sin(0)))];
@@ -663,7 +663,7 @@ static CGPathRef CGPathCreateArc(CGPoint center, CGFloat radius, CGFloat startAn
         label = (pieLayer.text)?pieLayer.text:[NSString stringWithFormat:@"%0.0f", value];
     
     // CGSize size = [label sizeWithFont:self.labelFont];
-    CGSize size = [label sizeWithAttributes:[NSDictionary dictionaryWithObjects:@[self.labelFont] forKeys:@[@"font"]]];
+    CGSize size = [label sizeWithAttributes:[NSDictionary dictionaryWithObjects:@[self.labelFont] forKeys:@[NSFontAttributeName]]];
     
     [CATransaction setDisableActions:YES];
     if(M_PI*2*_labelRadius*pieLayer.percentage < MAX(size.width,size.height) || value <= 0)
