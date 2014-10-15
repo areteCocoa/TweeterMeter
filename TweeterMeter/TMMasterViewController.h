@@ -12,6 +12,7 @@
 
 #import <CoreData/CoreData.h>
 #import "TMCreateTermViewController.h"
+#import "TMLoadingTermViewController.h"
 
 @interface TMMasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, TMCreateTermViewControllerDelegate>
 

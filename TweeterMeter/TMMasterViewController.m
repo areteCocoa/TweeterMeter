@@ -147,8 +147,18 @@
             
             // Update UI
             dispatch_async(dispatch_get_main_queue(), ^{
+                // Show loading view
+                TMLoadingTermViewController *loadingViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"loading"];
+                loadingViewController.view.frame = self.view.frame;
+                [self addChildViewController: loadingViewController];
+                [self.view addSubview: loadingViewController.view];
+                [loadingViewController didMoveToParentViewController:self];
+                
                 self.detailViewController.term = [[TMTerm alloc] initTermWithManagedTerm:managedTerm withContext:self.managedObjectContext];
                 [self.detailViewController.term beginFetchingTweetsOnOperationQueue:self.operationQueue];
+                
+                [loadingViewController removeFromParentViewController];
+                [loadingViewController.view removeFromSuperview];
             });
         });
     }
@@ -209,6 +219,10 @@
         case NSFetchedResultsChangeDelete:
             [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
             break;
+            
+        default:
+            NSLog(@"Error handling fetched results controller changes; unexpected results change type.");
+            break;
     }
 }
 
@@ -241,6 +255,7 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView endUpdates];
+    [self.tableView reloadData];
 }
 
 /*

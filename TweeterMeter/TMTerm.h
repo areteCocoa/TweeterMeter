@@ -53,4 +53,9 @@
 
 - (void)beginFetchingTweetsOnOperationQueue: (NSOperationQueue *)queue;
 
+// Controller methods
+- (void)startFetchingTweets;
+- (void)stopFetchingTweets;
+- (void)clearAllTweets;
+
 @end

@@ -143,6 +143,9 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
     // Find type from dictionary API
     self.type = nil;
     
+#warning "Dictionary data not fetched, Lexicontext broken"
+    
+    /*
     // Look up definition, invalidates invalid words
     Lexicontext *dictionaryContext = [Lexicontext sharedDictionary];
     
@@ -218,6 +221,7 @@ NSString *kAccessKey = @"SivOG2y8WD2UhAhpjuUd2FtCHRGmYfsWdSdFNTdo27FtsWALaYdre7n
             NSLog(@"Word needs connotation: %@", self.name);
         }
     }
+     */
 }
 
 // Recursive function to find synonyms of similar words

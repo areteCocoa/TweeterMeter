@@ -13,6 +13,8 @@
 @property (strong, nonatomic) TMChartViewController *chartViewController;
 @property (strong, nonatomic) TMFrequencyViewController *frequencyViewController;
 @property (strong, nonatomic) TMDataTimelineViewController *dataViewController;
+@property (strong, nonatomic) TMTermControlViewController *controlController;
+
 @property (strong, nonatomic) TMCurrentProcessViewController *currentProcessViewController;
 @property (strong, nonatomic) NSArray *viewControllers;
 
@@ -56,6 +58,7 @@
         self.chartViewController = [[TMChartViewController alloc] initWithTerm: self.term];
         self.frequencyViewController = [[TMFrequencyViewController alloc] initWithTerm: self.term];
         self.dataViewController = [[TMDataTimelineViewController alloc] initWithTerm: self.term];
+        self.controlController = [[TMTermControlViewController alloc] initWithTerm: self.term];
         self.viewControllers = @[self.chartViewController];
     }
     
@@ -166,23 +169,25 @@
 }
 
 - (void)tweetsDidFinishParsing {
-    dispatch_async(dispatch_get_main_queue(), ^ {
-        [self.currentProcessViewController showLabelViewWithText:@"Tweets finished being analyzed..."];
-    });
+    [self pushCurrentProcessMessage:@"Tweets finished being analyzed..." withCompletiton:nil];
 }
 
 - (void)tweetsDidSave {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Pass data to the VCs
-        [self.currentProcessViewController showLabelViewWithText:@"Tweets successfully saved to database!"];
-        [self updateSubviews];
-    });
+    [self pushCurrentProcessMessage:@"Tweets successfully saved to database." withCompletiton:^void() {[self updateSubviews];} ];
 }
 
 - (void)noResponseData {
+    [self pushCurrentProcessMessage:@"No response data from twitter! (No internet connection)" withCompletiton:nil];
+}
+
+- (void)pushCurrentProcessMessage: (NSString *)message withCompletiton:(void (^)())completion {
+    NSLog(@"%@", message);
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass data to the VCs
-        [self.currentProcessViewController showLabelViewWithText:@"No response data from twitter! (No internet connection)"];
+        [self.currentProcessViewController showLabelViewWithText:message];
+        if (completion) {
+            completion();
+        }
     });
 }
 
@@ -233,6 +238,7 @@
         return self.frequencyViewController;
     } else if (index == 2) {
         // return self.dataViewController;
+        return self.controlController;
     }
     return nil;
 }

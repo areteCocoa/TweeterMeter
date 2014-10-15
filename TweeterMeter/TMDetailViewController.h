@@ -14,6 +14,7 @@
 #import "TMChartViewController.h"
 #import "TMFrequencyViewController.h"
 #import "TMDataTimelineViewController.h"
+#import "TMTermControlViewController.h"
 #import "TMTerm.h"
 
 @protocol TMDetailSubController <NSObject>

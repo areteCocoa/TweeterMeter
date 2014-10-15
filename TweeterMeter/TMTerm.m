@@ -17,7 +17,6 @@
 @property (strong, nonatomic) Term *managedTerm;
 @property (strong, nonatomic) NSManagedObjectContext *context;
 @property (strong, nonatomic) NSManagedObjectContext *userInterfaceContext; // Context that data on the interface is on
-@property (strong, nonatomic) NSLock *addTweetLock;
 @property (strong, nonatomic) NSEntityDescription *entity;
 @property (strong, nonatomic) NSPersistentStoreCoordinator *store;
 
@@ -49,7 +48,6 @@
     self.isFetchingTweets = NO;
     self.shouldFetchTweets = NO;
     
-    self.addTweetLock = [[NSLock alloc] init];
     self.userInterfaceContext = [[NSManagedObjectContext alloc] init];
     [self.userInterfaceContext setPersistentStoreCoordinator:context.persistentStoreCoordinator];
     
@@ -175,6 +173,13 @@
         self.queue = queue;
     }
     queue.maxConcurrentOperationCount = 1;
+    
+# warning "Incomplete implementation"
+    BOOL autoCollectTweets = NO;
+    if (!autoCollectTweets) {
+        [self stopFetchingTweets];
+    }
+    
     [self fetchMaxTweetsOnQueue];
 }
 
@@ -256,10 +261,12 @@
 
 - (void)fetchMaxTweetsOnQueue {
     // NSInvocationOperation *saveOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(saveContext:) object:self.context];
-    [self.queue addOperations:@[self.fetchTweetsOperation] waitUntilFinished:YES];
+    [self.queue addOperations:@[self.fetchTweetsOperation] waitUntilFinished:NO];
 }
 
 - (void)fetchNumberOfTweets:(int)number {
+    NSLog(@"Attempting to fetch %i tweets.", number);
+    
     self.isFetchingTweets = YES;
     [self.delegate attemptingToConnectToTwitter];
     
@@ -274,6 +281,7 @@
         [store requestAccessToAccountsWithType:twitterAccountType options:NULL
                                     completion:^(BOOL granted, NSError *error) {
              if (granted) {
+                 NSLog(@"Access to Twitter granted.");
                  [self.delegate didConnectToTwitter];
                  // Create request with params
                  NSMutableDictionary *params = [@{@"q" : _name,
@@ -361,49 +369,49 @@
                  NSLog(@"Access not granted to twitter. Error: %@", [error localizedDescription]);
              }
          }];
+    } else {
+        NSLog(@"SLComposeViewController not available. Cannot connect to Twitter.");
     }
 }
 
 - (void)addTweet: (NSDictionary *)rawTweet inContext: (NSManagedObjectContext *)context {
-    @synchronized (self.addTweetLock) {
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
-        Tweet *tweet;
-        
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text == %@", [rawTweet objectForKey:@"text"]];
-        NSFetchRequest* fetch = [[NSFetchRequest alloc] init];
-        [fetch setPredicate:predicate];
-        [fetch setEntity:entity];
-        
-        NSError *error;
-        NSArray *array = [context executeFetchRequest:fetch error:&error];
-        if (error) {
-            NSLog(@"Error! %@", error);
-        } else if ([array firstObject]) {
-            id object = [array firstObject];
-            if ([object isKindOfClass:[Tweet class]]) {
-                tweet = object;
-            }
-        } else {
-            tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-            tweet.userName = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
-            tweet.userScreenName = [[rawTweet valueForKey:@"user"] valueForKey:@"screen_name"];
-            tweet.text = [rawTweet valueForKey:@"text"];
-            tweet.tweetID = [rawTweet valueForKey:@"id"];
-            
-            // Convert twitter date string to NSDate
-            NSString *creationDate = [[rawTweet valueForKey:@"created_at"] substringFromIndex:4];
-            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-            [formatter setDateFormat:@"MM dd HH:mm:ss '+0000' yyyy"];
-            NSDate *date = [formatter dateFromString:creationDate];
-            tweet.date = date;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:context];
+    Tweet *tweet;
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"text == %@", [rawTweet objectForKey:@"text"]];
+    NSFetchRequest* fetch = [[NSFetchRequest alloc] init];
+    [fetch setPredicate:predicate];
+    [fetch setEntity:entity];
+    
+    NSError *error;
+    NSArray *array = [context executeFetchRequest:fetch error:&error];
+    if (error) {
+        NSLog(@"Error! %@", error);
+    } else if ([array firstObject]) {
+        id object = [array firstObject];
+        if ([object isKindOfClass:[Tweet class]]) {
+            tweet = object;
         }
+    } else {
+        tweet = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+        tweet.userName = [[rawTweet valueForKey:@"user"] valueForKey:@"name"];
+        tweet.userScreenName = [[rawTweet valueForKey:@"user"] valueForKey:@"screen_name"];
+        tweet.text = [rawTweet valueForKey:@"text"];
+        tweet.tweetID = [rawTweet valueForKey:@"id"];
         
-        // Analyze Tweet
-        if (![self.managedTerm.tweets containsObject:tweet]) {
-            [self analyzeTweet:tweet];
-            tweet.term = self.managedTerm;
-            self.tweetCount++;
-        }
+        // Convert twitter date string to NSDate
+        NSString *creationDate = [[rawTweet valueForKey:@"created_at"] substringFromIndex:4];
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"MM dd HH:mm:ss '+0000' yyyy"];
+        NSDate *date = [formatter dateFromString:creationDate];
+        tweet.date = date;
+    }
+    
+    // Analyze Tweet
+    if (![self.managedTerm.tweets containsObject:tweet]) {
+        [self analyzeTweet:tweet];
+        tweet.term = self.managedTerm;
+        self.tweetCount++;
     }
 }
 
@@ -578,5 +586,20 @@
     [self.context setPersistentStoreCoordinator:self.store];
     self.managedTerm = (Term *)[self.context objectWithID:self.managedTerm.objectID];
 }
- 
+
+#pragma mark - Controller Methods
+
+- (void)startFetchingTweets {
+    [self.queue setSuspended:NO];
+}
+
+- (void)stopFetchingTweets {
+    [self.queue setSuspended:YES];
+}
+
+- (void)clearAllTweets {
+    [self stopFetchingTweets];
+#warning "Incomplete implementation"
+}
+
 @end

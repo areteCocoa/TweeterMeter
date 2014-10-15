@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		54041AE319CC9E5F00B72D70 /* TMTermControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54041AE219CC9E5F00B72D70 /* TMTermControlViewController.m */; };
 		5407ACD218C8D6020073BFDD /* LexicontextAssets.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5407ACD018C8D6020073BFDD /* LexicontextAssets.bundle */; };
-		5407ACD318C8D6020073BFDD /* libLexicontext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5407ACD118C8D6020073BFDD /* libLexicontext.a */; };
 		5407ACD618C8FA470073BFDD /* TMCurrentProcessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5407ACD518C8FA470073BFDD /* TMCurrentProcessViewController.m */; };
 		5440858D18C4A50300639A07 /* TMTweetCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5440858C18C4A50300639A07 /* TMTweetCell.m */; };
 		5444FF5E187DDB6800B8C225 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5444FF5D187DDB6800B8C225 /* QuartzCore.framework */; };
 		5457EB3718A97E95005E400F /* TMInvalidStringLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5457EB3618A97E95005E400F /* TMInvalidStringLoader.m */; };
 		547495DF18674D1900B969DB /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 547495DE18674D1900B969DB /* Social.framework */; };
+		54875CDD18D2249900C96C15 /* TMLoadingTermViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54875CDC18D2249900C96C15 /* TMLoadingTermViewController.m */; };
 		548EB46318B28162008F34C2 /* XYPieChart.m in Sources */ = {isa = PBXBuildFile; fileRef = 548EB46218B28162008F34C2 /* XYPieChart.m */; };
+		5493F7EE19CA8EAD0072E212 /* libLexicontext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5407ACD118C8D6020073BFDD /* libLexicontext.a */; };
 		549BE7FB18C832750045FF97 /* TMCreateTermViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549BE7FA18C832750045FF97 /* TMCreateTermViewController.m */; };
 		549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D186E1878DCB70017D41E /* TMChartViewController.m */; };
 		549D18721878DCDF0017D41E /* TMFrequencyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 549D18711878DCDF0017D41E /* TMFrequencyViewController.m */; };
@@ -63,6 +65,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		54041AE019CC99C100B72D70 /* PrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		54041AE119CC9E5F00B72D70 /* TMTermControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMTermControlViewController.h; sourceTree = "<group>"; };
+		54041AE219CC9E5F00B72D70 /* TMTermControlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMTermControlViewController.m; sourceTree = "<group>"; };
 		5407ACD018C8D6020073BFDD /* LexicontextAssets.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = LexicontextAssets.bundle; sourceTree = "<group>"; };
 		5407ACD118C8D6020073BFDD /* libLexicontext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLexicontext.a; sourceTree = "<group>"; };
 		5407ACD418C8FA470073BFDD /* TMCurrentProcessViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMCurrentProcessViewController.h; sourceTree = "<group>"; };
@@ -74,6 +79,8 @@
 		5457EB3518A97E95005E400F /* TMInvalidStringLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMInvalidStringLoader.h; sourceTree = "<group>"; };
 		5457EB3618A97E95005E400F /* TMInvalidStringLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMInvalidStringLoader.m; sourceTree = "<group>"; };
 		547495DE18674D1900B969DB /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		54875CDB18D2249900C96C15 /* TMLoadingTermViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMLoadingTermViewController.h; sourceTree = "<group>"; };
+		54875CDC18D2249900C96C15 /* TMLoadingTermViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMLoadingTermViewController.m; sourceTree = "<group>"; };
 		548EB46118B28162008F34C2 /* XYPieChart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XYPieChart.h; path = TweeterMeter/XYPieChart.h; sourceTree = SOURCE_ROOT; };
 		548EB46218B28162008F34C2 /* XYPieChart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XYPieChart.m; path = TweeterMeter/XYPieChart.m; sourceTree = SOURCE_ROOT; };
 		549BE7F918C832750045FF97 /* TMCreateTermViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMCreateTermViewController.h; sourceTree = "<group>"; };
@@ -112,7 +119,6 @@
 		54E0AFBF18667C7B00EA5100 /* TweeterMeter-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TweeterMeter-Info.plist"; sourceTree = "<group>"; };
 		54E0AFC118667C7B00EA5100 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		54E0AFC318667C7B00EA5100 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		54E0AFC518667C7B00EA5100 /* TweeterMeter-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TweeterMeter-Prefix.pch"; sourceTree = "<group>"; };
 		54E0AFC618667C7B00EA5100 /* TMAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TMAppDelegate.h; sourceTree = "<group>"; };
 		54E0AFC718667C7B00EA5100 /* TMAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TMAppDelegate.m; sourceTree = "<group>"; };
 		54E0AFCA18667C7B00EA5100 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -144,7 +150,7 @@
 				54E0AFBC18667C7B00EA5100 /* CoreData.framework in Frameworks */,
 				54E0AFBA18667C7B00EA5100 /* UIKit.framework in Frameworks */,
 				54E0AFB618667C7B00EA5100 /* Foundation.framework in Frameworks */,
-				5407ACD318C8D6020073BFDD /* libLexicontext.a in Frameworks */,
+				5493F7EE19CA8EAD0072E212 /* libLexicontext.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,6 +177,8 @@
 				549D18711878DCDF0017D41E /* TMFrequencyViewController.m */,
 				549D18731878DCEC0017D41E /* TMDataTimelineViewController.h */,
 				549D18741878DCEC0017D41E /* TMDataTimelineViewController.m */,
+				54041AE119CC9E5F00B72D70 /* TMTermControlViewController.h */,
+				54041AE219CC9E5F00B72D70 /* TMTermControlViewController.m */,
 			);
 			name = "Detail View Controllers";
 			sourceTree = "<group>";
@@ -257,6 +265,8 @@
 				54E0AFC618667C7B00EA5100 /* TMAppDelegate.h */,
 				54E0AFC718667C7B00EA5100 /* TMAppDelegate.m */,
 				54E0AFC918667C7B00EA5100 /* Main.storyboard */,
+				54875CDB18D2249900C96C15 /* TMLoadingTermViewController.h */,
+				54875CDC18D2249900C96C15 /* TMLoadingTermViewController.m */,
 				5407ACD418C8FA470073BFDD /* TMCurrentProcessViewController.h */,
 				5407ACD518C8FA470073BFDD /* TMCurrentProcessViewController.m */,
 				5440858B18C4A50300639A07 /* TMTweetCell.h */,
@@ -292,8 +302,8 @@
 				54DEF0B118C2354C004FAB83 /* connotations.xml */,
 				54E0AFBF18667C7B00EA5100 /* TweeterMeter-Info.plist */,
 				54E0AFC018667C7B00EA5100 /* InfoPlist.strings */,
+				54041AE019CC99C100B72D70 /* PrefixHeader.pch */,
 				54E0AFC318667C7B00EA5100 /* main.m */,
-				54E0AFC518667C7B00EA5100 /* TweeterMeter-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -432,6 +442,7 @@
 				54C234691888590E0033ECB0 /* Term.m in Sources */,
 				54D2B8531890529C00F42BD4 /* FrequencyTag.m in Sources */,
 				549D186F1878DCB70017D41E /* TMChartViewController.m in Sources */,
+				54875CDD18D2249900C96C15 /* TMLoadingTermViewController.m in Sources */,
 				54D2BAD918B581C40067212E /* DisplaySettings.m in Sources */,
 				54E0AFCE18667C7B00EA5100 /* TweeterMeter.xcdatamodeld in Sources */,
 				549D18751878DCEC0017D41E /* TMDataTimelineViewController.m in Sources */,
@@ -447,6 +458,7 @@
 				54D2B8501890529C00F42BD4 /* FrequencyUser.m in Sources */,
 				54E0AFF518668F7000EA5100 /* UIAlertView+Blocks.m in Sources */,
 				54D2B8561890529C00F42BD4 /* FrequencyWord.m in Sources */,
+				54041AE319CC9E5F00B72D70 /* TMTermControlViewController.m in Sources */,
 				5407ACD618C8FA470073BFDD /* TMCurrentProcessViewController.m in Sources */,
 				54E0AFC818667C7B00EA5100 /* TMAppDelegate.m in Sources */,
 				5440858D18C4A50300639A07 /* TMTweetCell.m in Sources */,
@@ -582,12 +594,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TweeterMeter/TweeterMeter-Prefix.pch";
+				GCC_PREFIX_HEADER = TweeterMeter/PrefixHeader.pch;
 				INFOPLIST_FILE = "TweeterMeter/TweeterMeter-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/evilflyingtoaster/Desktop/Xcode\\ Projects/TweeterMeter/TweeterMeter",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/TweeterMeter";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -602,12 +611,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TweeterMeter/TweeterMeter-Prefix.pch";
+				GCC_PREFIX_HEADER = TweeterMeter/PrefixHeader.pch;
 				INFOPLIST_FILE = "TweeterMeter/TweeterMeter-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"/Users/evilflyingtoaster/Desktop/Xcode\\ Projects/TweeterMeter/TweeterMeter",
-				);
+				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/TweeterMeter";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

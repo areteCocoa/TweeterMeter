@@ -70,6 +70,9 @@ NSString *kDetailCellReuse = @"tweetCell";
         
         if (self.selectedIndex != -1) {
             [self.pieChart setSliceSelectedAtIndex:self.selectedIndex];
+        }else if (self.tweetData.count == 0) {
+            self.tweetData = [self.term newestTweets:self.numberOfTweetsToDisplay];
+            [self.detailTableView reloadData];
         }
     }
 }
