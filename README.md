@@ -1,7 +1,7 @@
 TweeterMeter
 ============
 
-An iPad application that fetches Twitter data and analyzes it linguistically and statistically.
+iPad app that fetches Twitter data and analyzes it linguistically (todo) and statistically.
 
 Current Features:
 - Fetch tweets from twitter given a search term
